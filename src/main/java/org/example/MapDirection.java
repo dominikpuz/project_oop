@@ -1,39 +1,46 @@
 package org.example;
 
 public enum MapDirection {
-    north,
-    northEast,
-    east,
-    southEast,
-    south,
-    southWest,
-    west,
-    northWest,
-    OTHER;
-    public  MapDirection next(){
+    NORTH,
+    NORTHEAST,
+    EAST,
+    SOUTHEAST,
+    SOUTH,
+    SOUTHWEST,
+    WEST,
+    NORTHWEST;
+
+    public MapDirection rotate(int rotation) {
+        MapDirection currDirection = this;
+        for (int i = 0; i < rotation; i++) {
+            currDirection = currDirection.next();
+        }
+        return currDirection;
+    }
+
+    public MapDirection next() {
         return switch (this) {
-            case north -> northEast;
-            case northEast -> east;
-            case east-> southEast;
-            case southEast -> south;
-            case south -> southWest;
-            case southWest -> west;
-            case west ->northWest;
-            case northWest -> north;
-            default -> null;
+            case NORTH -> NORTHEAST;
+            case NORTHEAST -> EAST;
+            case EAST -> SOUTHEAST;
+            case SOUTHEAST -> SOUTH;
+            case SOUTH -> SOUTHWEST;
+            case SOUTHWEST -> WEST;
+            case WEST -> NORTHWEST;
+            case NORTHWEST -> NORTH;
         };
     }
-    public Vector2d toUnitVector(){
+
+    public Vector2d toUnitVector() {
         return switch (this) {
-            case north-> new Vector2d(0,1);
-            case northEast -> new Vector2d(1, 1);
-            case east-> new Vector2d(1, 0);
-            case south -> new Vector2d(0, -1);
-            case southEast -> new Vector2d(1,-1);
-            case southWest -> new Vector2d(-1,-1);
-            case west -> new Vector2d(-1,0);
-            case northWest->new Vector2d(-1,1);
-            default -> null;
+            case NORTH -> new Vector2d(0, 1);
+            case NORTHEAST -> new Vector2d(1,1);
+            case EAST -> new Vector2d(1, 0);
+            case SOUTHEAST -> new Vector2d(1, -1);
+            case SOUTH -> new Vector2d(0, -1);
+            case SOUTHWEST -> new Vector2d(-1, -1);
+            case WEST -> new Vector2d(-1, 0);
+            case NORTHWEST -> new Vector2d(-1, 1);
         };
     }
 }

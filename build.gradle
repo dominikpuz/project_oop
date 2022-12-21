@@ -5,7 +5,7 @@ plugins {
 }
 
 application {
-    getMainClass().set('org.exampple.World')
+    getMainClass().set('org.example.World')
 }
 
 java {
