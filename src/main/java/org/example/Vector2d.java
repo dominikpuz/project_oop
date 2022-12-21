@@ -3,6 +3,7 @@ package org.example;
 import java.util.Objects;
 
 public class Vector2d {
+
     private final int x, y;
 
     public Vector2d(int x, int y) {
