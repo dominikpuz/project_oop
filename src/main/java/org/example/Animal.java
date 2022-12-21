@@ -44,6 +44,7 @@ public class Animal extends IMapElement{
             case 5 -> MapDirection.SOUTHWEST;
             case 6 -> MapDirection.WEST;
             case 7 -> MapDirection.NORTHWEST;
+            default -> null;
         };
     }
 
@@ -51,9 +52,9 @@ public class Animal extends IMapElement{
         direction = direction.rotate(genes[geneIndex]);
         
         Vector2d tempPosition;
-        tempPosition=position.add(orientation.toUnitVector());
+        tempPosition=position.add(direction.toUnitVector());
         for(IPositionChangeObserver observer:observers){
-            observer.positionChanged(tmepPosition, position);
+            observer.positionChanged(tempPosition, position);
         }
         this.position=tempPosition;
         position = position.add(direction.toUnitVector());
