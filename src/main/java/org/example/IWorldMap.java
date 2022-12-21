@@ -9,7 +9,7 @@ public interface IWorldMap {
     void Moveto(Vector2d position,Animal animal);
 
 
-    boolean place(Animal animal);
+    void place(IMapElement object);
 
     /**
      * Return true if given position on the map is occupied. Should not be
@@ -30,5 +30,5 @@ public interface IWorldMap {
      * @return Object or null if the position is not occupied.
      */
     Object objectAt(Vector2d position);
-    void deadAnimal();
+    void removeDeadAnimals();
 }
