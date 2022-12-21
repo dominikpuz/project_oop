@@ -1,5 +1,17 @@
 plugins {
+    id 'application'
     id 'java'
+    id 'org.openjfx.javafxplugin' version '0.0.13'
+}
+
+application {
+    getMainClass().set('org.example.World')
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(18))
+    }
 }
 
 group 'org.example'
