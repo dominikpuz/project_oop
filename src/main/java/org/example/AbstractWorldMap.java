@@ -3,8 +3,8 @@ package org.example;
 import java.util.HashMap;
 
 
-public class AbstractWorldMap implements IPositionChangeObserver {
-    protected HashMap<Vector2d, GridObject> objectsOnMap= new HashMap<>();
+public abstract class AbstractWorldMap implements IPositionChangeObserver {
+    protected HashMap<Vector2d, GridObject> objectsOnMap;
     MapBoundary mapBoundary;
     int energyGrass;
     int readyToReproduction;
@@ -39,7 +39,7 @@ public class AbstractWorldMap implements IPositionChangeObserver {
     }
 
 
-    public void removeDeadAnimals()
+    public void removeDeadAnimals() {
         for (GridObject x : objectsOnMap.values()){
             x.deadAnimal();
         }
