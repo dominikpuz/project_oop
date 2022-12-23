@@ -3,8 +3,10 @@ package org.example;
 import java.util.HashMap;
 
 public class AbstractWorldMap implements IWorldMap,IPositionChangeObserver {
-    protected HashMap<Vector2d, IMapElement> objectsOnMap= new HashMap<>();
+    protected HashMap<Vector2d, GridObject> objectsOnMap= new HashMap<>();
     MapBoundary mapBoundary;
+    int energyGrass;
+    int readyToReproduction;
 
 
     @Override
@@ -18,9 +20,9 @@ public class AbstractWorldMap implements IWorldMap,IPositionChangeObserver {
     }
 
     @Override
-    public void place(IMapElement object) {
-        objectsOnMap.put(object.getPosition(),object);
-
+    public void place(Animal object) {
+        GridObject grid=objectsOnMap.get(object.getPosition());
+        grid.addAnimal(object);
     }
 
     @Override
@@ -31,21 +33,28 @@ public class AbstractWorldMap implements IWorldMap,IPositionChangeObserver {
     @Override
     public Object objectAt(Vector2d position) {
         return objectsOnMap.get(position);
-
-
     }
 
 
     public void removeDeadAnimals() {
-        for (IMapElement x : objectsOnMap.values()){
-            if(x instanceof Animal && ((Animal) x).getEnergy()==0){
-                objectsOnMap.remove(x.getPosition());
-                mapBoundary.remove(x.getPosition());
-                /**
-                 usuwamy zwierzeta z energia 0<- zwierze które zmarło
-                 */
-            }
+        for (GridObject x : objectsOnMap.values()){
+            x.deadAnimal();
         }
 
     }
+
+    public void reproduction(){
+        for (GridObject x : objectsOnMap.values()){
+            x.Reproduction ();
+        }
+
+
+    }
+    public void feedAnimals(){
+        for (GridObject x : objectsOnMap.values()){
+            x.feedAnimal();
+        }
+
+    }
+
 }

@@ -10,6 +10,8 @@ public class Animal extends IMapElement{
     private List<IPositionChangeObserver> observers = new ArrayList<>();
     private int geneIndex;
     private IWorldMap map;
+    private int days;
+    private int kids;
 
     public Animal(Vector2d position, int energy, int[] genes, IWorldMap map) {
         super(position);
@@ -19,10 +21,21 @@ public class Animal extends IMapElement{
         direction = randomDirection();
         this.genes = genes;
         addObserver((IPositionChangeObserver) map);
+        this.days=1;
+        this.kids=0;
     }
     
     public int getEnergy(){
         return energy;
+    }
+    public int getKids(){
+        return kids;
+    }
+    public int getDays(){
+        return days;
+    }
+    public void  addEnergy(int energyToAdd){
+        energy+=energyToAdd;
     }
     
     public void addObserver(IPositionChangeObserver observer){
@@ -57,10 +70,9 @@ public class Animal extends IMapElement{
             observer.positionChanged(tempPosition, position);
         }
         this.position=tempPosition;
-        position = position.add(direction.toUnitVector());
-        
         geneIndex = (geneIndex + 1) % genes.length;
         energy--;
+        days++;
 //        TODO check for death
     }
 }

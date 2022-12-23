@@ -9,7 +9,7 @@ public class SimulationEngine {
     private int numberofGrass;
     private int numberofAnimals;
     private List<Animal> animals;
-    public SimulationEngine(int energyGrass,int numberofGrass,int numberofAnimals,int n,int energyofAnimal) {
+    public SimulationEngine(int energyGrass,int numberofGrass,int numberofAnimals,int n,int energyofAnimal, int readytoReproduction) {
         this.energyGrass=energyGrass;
         this.numberofAnimals=numberofAnimals;
         this.numberofGrass=numberofGrass;
