@@ -1,12 +1,12 @@
 package org.example;
 
 public interface IWorldMap {
-    /**
-     * Indicate if any object can move to the given position.
-     *
-     * @param position The position checked for the movement possibility.
-     */
-    void Moveto(Vector2d position,Animal animal);
+//    /**
+//     * Indicate if any object can move to the given position.
+//     *
+//     * @param position The position checked for the movement possibility.
+//     */
+//    void moveTo(Vector2d position,Animal animal);
 
 
     void place(IMapElement object);
