@@ -9,7 +9,7 @@ public interface IWorldMap {
 //    void moveTo(Vector2d position,Animal animal);
 
 
-    void place(IMapElement object);
+    void place(Animal object);
 
     /**
      * Return true if given position on the map is occupied. Should not be
