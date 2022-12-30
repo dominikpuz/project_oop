@@ -47,9 +47,9 @@ public class Simulation extends Application {
         HBox content = new HBox(stats, sp);
         VBox container = new VBox(menu, content);
         scene = new Scene(container, 700, 600);
-        map = new Globe(10, 10);
-        SimulationEngine engine = new SimulationEngine(map, 10, 10, 5, 7,
-                20, 15, this);
+        SimulationEngine engine = new SimulationEngine(0, 1, 10, 5, 10, 7,
+                20, 15, 10, 10,10, this);
+        map = engine.getMap();
         engineThread = new Thread(engine);
         engineThread.start();
 //        startButton.setOnAction(e -> {

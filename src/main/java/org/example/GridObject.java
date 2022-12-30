@@ -5,21 +5,40 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.lang.Math;
 
-public class GridObject {
+public abstract class GridObject  {
     private List<Animal> animalsOnGrid;
     private Grass grass;
+    private Vector2d position;
+    private AbstractWorldMap map;
+    protected int n;
+    private int energyToReproduction;
+    private List<AnimalObserver> observers = new ArrayList<>();
+    private int energyToKid;
     private int grassProbability;
 
-    public GridObject(int grassProbability) {
+    public GridObject(Vector2d position, AbstractWorldMap map, int n, int energyToReproduction,int energyToKid,SimulationEngine engine) {
         animalsOnGrid = new ArrayList<>();
-        this.grassProbability = grassProbability;
         grass = null;
+        this.grassProbability = 20;
+        this.position = position;
+        this.map = map;
+        this.n = n;
+        this.energyToReproduction = energyToReproduction;
+        observers.add(engine);
+        this.energyToKid=energyToKid;
+
+
+    }
+
+    public void addObserver(AnimalObserver observer){
+        observers.add(observer);
     }
 
     public VBox getBox() throws FileNotFoundException {
@@ -44,6 +63,21 @@ public class GridObject {
         return box;
     }
 
+    public void removeAnimal(Animal removeAnimal) {
+        animalsOnGrid.remove(removeAnimal);
+    }
+
+
+    public void deadAnimal() {
+        for (Animal x : animalsOnGrid) {
+            if (x.getEnergy() <= 0) {
+                animalsOnGrid.remove(x);
+                for (AnimalObserver observer : observers) {
+                    observer.removeAnimal(x);
+                }
+            }
+        }
+    }
     public int getGrassProbability() {
         return grassProbability;
     }
@@ -62,21 +96,6 @@ public class GridObject {
 
     public void addAnimal(Animal animalToAdd) {
         animalsOnGrid.add(animalToAdd);
-    }
-    public void removeAnimal(Animal animal) {
-        animalsOnGrid.remove(animal);
-    }
-
-    public List<Animal> deadAnimal() {
-        List<Animal> removedAnimals = new ArrayList<>();
-        for (Animal x : animalsOnGrid) {
-            if (x.getEnergy() <= 0) {
-                animalsOnGrid.remove(x);
-                removedAnimals.add(x);
-            }
-
-        }
-        return removedAnimals;
     }
 
     public Animal bestAnimal(ArrayList<Animal> tmp) {
@@ -131,22 +150,70 @@ public class GridObject {
         }
         return maxAnimal;
     }
-    public void feedAnimal () {
+
+    public void newKid(Animal animal1, Animal animal2) {
+        int gen1 = (int) Math.round(((double) animal1.getEnergy() / (animal2.getEnergy() + animal1.getEnergy()) * n));
+        java.util.Random generator = new Random();
+        int[] genTable = new int[n];
+        if (generator.nextInt(2) == 0) {
+            for (int i = 0; i < n; i++) {
+                genTable[i] = animal1.getTable()[i];
+            }
+            for (int j = gen1; j < n; j++) {
+                genTable[j] = animal2.getTable()[j];
+            }
+        } else {
+            for (int i = 0; i < n; i++) {
+                genTable[i] = animal2.getTable()[i];
+            }
+            for (int j = gen1; j < n; j++) {
+                genTable[j] = animal1.getTable()[j];
+            }
+        }
+        Animal newanimal = new Animal(animal2.getPosition(), 2 * energyToKid, this.createRandomGen(genTable), this.map);
+        animal1.reduceEnergy(energyToKid);
+        animal2.reduceEnergy(energyToKid);
+        animal1.addDays();
+        animal2.addKids();
+
+        this.addAnimal(newanimal);
+        for (AnimalObserver observer : observers) {
+            observer.addAnimal(newanimal);
+        }
+
+    }
+
+    public void feedAnimal() {
         if (grass != null && animalsOnGrid.size() > 0) {
             bestAnimal((ArrayList<Animal>) animalsOnGrid).addEnergy(grass.getEnergy());
             grass = null;
         }
     }
-    public List<Animal> Reproduction (){
+
+
+    abstract int[] createRandomGen(int[] genTable);
+
+
+    public void Reproduction() {
         ArrayList<Animal> tmp = new ArrayList<>(animalsOnGrid);
-        Animal animal1=bestAnimal(tmp);
-        tmp.remove(animal1);
-        Animal animal2=bestAnimal(tmp);
-        tmp.remove(animal2);
-        return new ArrayList<>();
+        Animal animal1;
+        Animal animal2;
+        while (true) {
+            animal1 = bestAnimal(tmp);
+            tmp.remove(animal1);
+            animal2 = bestAnimal(tmp);
+            tmp.remove(animal2);
+            if (animal1 != null && animal2 != null) {
+                if (animal2.getEnergy() >= energyToReproduction) {
+                    this.newKid(animal1, animal2);
+                }
+            } else {
+                break;
+            }
+        }
     }
 
-
-
-
+    public Vector2d position(){
+        return this.position;
+    }
 }

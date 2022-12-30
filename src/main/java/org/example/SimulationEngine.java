@@ -6,29 +6,47 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class SimulationEngine implements Runnable {
+public class SimulationEngine implements  AnimalObserver, Runnable {
     private int energyGrass;
     private int numberOfGrass;
     private int numberOfAnimals;
     private List<Animal> animals;
     private AbstractWorldMap map;
     private Simulation mapObserver;
-
-    public SimulationEngine(AbstractWorldMap map, int energyGrass, int numberOfGrass, int numberOfAnimals, int n, int energyOfAnimal, int readytoReproduction, Simulation mapObserver) {
+    public SimulationEngine(int mapType, int randomType, int energyGrass, int numberOfGrass, int numberOfAnimals, int n, int energyOfAnimal, int readytoReproduction,int energyToKid,int height,int width, Simulation mapObserver) {
         this.energyGrass = energyGrass;
         this.numberOfAnimals = numberOfAnimals;
         this.numberOfGrass = numberOfGrass;
-        this.map = map;
+        if (mapType == 0) {
+            map = new Globe(width, height);
+        } else {
+            map = new HellsPortal(width, height, energyToKid);
+        }
         this.mapObserver = mapObserver;
-        spawnGrass();
         Random rand = new Random();
         this.animals = new ArrayList<>();
+        for(int i=0;i<width;i++){
+            for(int j=0;j<height;j++){
+                if (randomType == 0) {
+                    GridObject grid=new PartRandom(energyGrass,new Vector2d(i,j),map,n,readytoReproduction,energyToKid,this);
+                    map.addGridObject(grid);
+                } else {
+                    map.addGridObject(new RandomGen(new Vector2d(i,j),map,n,readytoReproduction,energyToKid,this));
+                }
+            }
+        }
+        map.setGrassSpawnProbability(width, height);
+        spawnGrass();
         for (int i = 0; i < numberOfAnimals; i++) {
             Animal animal = new Animal(new Vector2d(rand.nextInt(map.getWidth()), rand.nextInt(map.getHeight())), energyOfAnimal, this.randomGen(n), map);
             animals.add(animal);
             map.place(animal);
         }
         mapObserver.updateMap();
+    }
+
+    public AbstractWorldMap getMap() {
+        return map;
     }
 
     public int[] randomGen(int n) {
@@ -41,6 +59,16 @@ public class SimulationEngine implements Runnable {
             genTable[i] = generator.nextInt(8);
         }
         return genTable;
+    }
+
+    @Override
+    public void addAnimal(Animal animal) {
+        animals.add(animal);
+    }
+
+    @Override
+    public void removeAnimal(Animal animal) {
+        animals.remove(animal);
     }
 
     private void spawnGrass() {
@@ -65,10 +93,7 @@ public class SimulationEngine implements Runnable {
     public void run() {
         for (int i = 0; i < 5; i++) {
 
-            for (Animal animal :
-                    map.removeDeadAnimals()) {
-                animals.remove(animal);
-            }
+            map.removeDeadAnimals();
 //        mapObserver.updateMap();
             List<Vector2d> moves = new ArrayList<>();
             for (Animal animal :
@@ -86,7 +111,7 @@ public class SimulationEngine implements Runnable {
 //        mapObserver.updateMap();
             for (Vector2d position :
                     moves) {
-                animals.addAll(((GridObject) map.objectAt(position)).Reproduction());
+                ((GridObject) map.objectAt(position)).Reproduction();
             }
 //        mapObserver.updateMap();
             spawnGrass();

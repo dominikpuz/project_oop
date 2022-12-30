@@ -9,6 +9,7 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver {
     protected HashMap<Vector2d, GridObject> objectsOnMap;
     int energyGrass;
     int readyToReproduction;
+
     protected int width;
     protected int height;
 
@@ -16,23 +17,22 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver {
         objectsOnMap = new HashMap<>();
         this.width = width;
         this.height = height;
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++ ) {
-                objectsOnMap.put(new Vector2d(i, j), new GridObject(20));
-            }
-        }
-        setGrassSpawnProbability(width, height);
+    }
+
+    public void addGridObject(GridObject grid){
+        objectsOnMap.put(grid.position(),grid);
     }
 
     public int getWidth() {
         return width;
     }
 
+
     public int getHeight() {
         return height;
     }
 
-    private void setGrassSpawnProbability(int width, int height) {
+    public void setGrassSpawnProbability(int width, int height) {
         int highProbabilityFields = (int) Math.ceil((width * height) * 0.2);
         if (height % 2 == 0) {
             int i = (int) Math.floor((double) height / 2);
@@ -93,12 +93,10 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver {
     }
 
 
-    public List<Animal> removeDeadAnimals() {
-        List<Animal> removedAnimals = new ArrayList<>();
+    public void removeDeadAnimals() {
         for (GridObject x : objectsOnMap.values()){
-            removedAnimals.addAll(x.deadAnimal());
+            x.deadAnimal();
         }
-        return removedAnimals;
     }
 
     public void reproduction(){
