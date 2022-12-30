@@ -2,7 +2,7 @@ package org.example;
 
 public class PartRandom extends GridObject{
     public PartRandom(int energyGrass, Vector2d position, AbstractWorldMap map, int n, int energyToReproduction,int energyToKid, SimulationEngine engine) {
-        super(energyGrass, position, map, n, energyToReproduction,energyToKid,engine);
+        super(position, map, n, energyToReproduction,energyToKid,engine);
     }
 
     @Override

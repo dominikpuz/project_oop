@@ -1,25 +1,32 @@
 package org.example;
 
-
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.lang.Math;
 
-
 public abstract class GridObject  {
-    public List<Animal> AnimalsOnGrid = new ArrayList<Animal>();
-    private boolean isGrass;
-    protected int energyGrass;
+    private List<Animal> animalsOnGrid;
+    private Grass grass;
     private Vector2d position;
     private AbstractWorldMap map;
     protected int n;
     private int energyToReproduction;
     private List<AnimalObserver> observers = new ArrayList<>();
     private int energyToKid;
+    private int grassProbability;
 
-    public GridObject(int energyGrass, Vector2d position, AbstractWorldMap map, int n, int energyToReproduction,int energyToKid,SimulationEngine engine) {
-        this.energyGrass = energyGrass;
+    public GridObject(Vector2d position, AbstractWorldMap map, int n, int energyToReproduction,int energyToKid,SimulationEngine engine) {
+        animalsOnGrid = new ArrayList<>();
+        grass = null;
+        this.grassProbability = 20;
         this.position = position;
         this.map = map;
         this.n = n;
@@ -29,39 +36,66 @@ public abstract class GridObject  {
 
 
     }
+
     public void addObserver(AnimalObserver observer){
         observers.add(observer);
     }
 
-    public void grass() {
-        isGrass = true;
-    }
-
-    public boolean isGrass() {
-        return isGrass;
-    }
-
-    public void addAnimal(Animal animalToAdd) {
-        AnimalsOnGrid.add(animalToAdd);
+    public VBox getBox() throws FileNotFoundException {
+        VBox box = new VBox();
+        if (grass != null) {
+            Image image = new Image(new FileInputStream("src/main/resources/" + grass.getTexture()));
+            ImageView imageView = new ImageView(image);
+            imageView.setFitHeight(20);
+            imageView.setFitWidth(20);
+            box.getChildren().add(imageView);
+        }
+        for (Animal animal :
+                animalsOnGrid) {
+            Image image = new Image(new FileInputStream("src/main/resources/" + animal.getTexture()));
+            ImageView imageView = new ImageView(image);
+            imageView.setFitHeight(20);
+            imageView.setFitWidth(20);
+            VBox animalBox = new VBox(imageView, new Label(Integer.toString(animal.getEnergy())));
+            box.getChildren().add(animalBox);
+        }
+        box.setAlignment(Pos.CENTER);
+        return box;
     }
 
     public void removeAnimal(Animal removeAnimal) {
-        AnimalsOnGrid.remove(removeAnimal);
+        animalsOnGrid.remove(removeAnimal);
     }
 
 
     public void deadAnimal() {
-        for (Animal x : AnimalsOnGrid) {
+        for (Animal x : animalsOnGrid) {
             if (x.getEnergy() <= 0) {
-                AnimalsOnGrid.remove(x);
-                for(AnimalObserver observer:observers){
+                animalsOnGrid.remove(x);
+                for (AnimalObserver observer : observers) {
                     observer.removeAnimal(x);
                 }
-
-
             }
-
         }
+    }
+    public int getGrassProbability() {
+        return grassProbability;
+    }
+
+    public Grass getGrass() {
+        return grass;
+    }
+
+    public void spawnGrass(Vector2d position, int energy) {
+        grass = new Grass(position, energy);
+    }
+
+    public void setGrassProbability(int grassProbability) {
+        this.grassProbability = grassProbability;
+    }
+
+    public void addAnimal(Animal animalToAdd) {
+        animalsOnGrid.add(animalToAdd);
     }
 
     public Animal bestAnimal(ArrayList<Animal> tmp) {
@@ -117,12 +151,6 @@ public abstract class GridObject  {
         return maxAnimal;
     }
 
-    public void feedAnimal() {
-        if (isGrass) {
-            bestAnimal((ArrayList<Animal>) AnimalsOnGrid).addEnergy(energyGrass);
-        }
-    }
-
     public void newKid(Animal animal1, Animal animal2) {
         int gen1 = (int) Math.round(((double) animal1.getEnergy() / (animal2.getEnergy() + animal1.getEnergy()) * n));
         java.util.Random generator = new Random();
@@ -149,11 +177,17 @@ public abstract class GridObject  {
         animal2.addKids();
 
         this.addAnimal(newanimal);
-        for(AnimalObserver observer:observers){
+        for (AnimalObserver observer : observers) {
             observer.addAnimal(newanimal);
         }
 
+    }
 
+    public void feedAnimal() {
+        if (grass != null && animalsOnGrid.size() > 0) {
+            bestAnimal((ArrayList<Animal>) animalsOnGrid).addEnergy(grass.getEnergy());
+            grass = null;
+        }
     }
 
 
@@ -161,7 +195,7 @@ public abstract class GridObject  {
 
 
     public void Reproduction() {
-        ArrayList<Animal> tmp = new ArrayList<>(AnimalsOnGrid);
+        ArrayList<Animal> tmp = new ArrayList<>(animalsOnGrid);
         Animal animal1;
         Animal animal2;
         while (true) {

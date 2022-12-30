@@ -89,6 +89,7 @@ public class Animal extends IMapElement{
     public void move() {
         direction = direction.rotate(genes[geneIndex]);
         Vector2d tempPosition = map.moveTo(position.add(direction.toUnitVector()), this);
+        energy--;
         if (!tempPosition.equals(position)) {
             for(IPositionChangeObserver observer:observers){
                 observer.positionChanged(position, tempPosition,this);
@@ -96,10 +97,21 @@ public class Animal extends IMapElement{
             position = tempPosition;
         }
         geneIndex = (geneIndex + 1) % genes.length;
-        energy--;
         days++;
+    }
 
-//        TODO check for death
+    @Override
+    String getTexture() {
+        return switch (direction) {
+            case NORTH -> "north.png";
+            case NORTHEAST -> "northeast.png";
+            case EAST -> "east.png";
+            case SOUTHEAST -> "southeast.png";
+            case SOUTH -> "south.png";
+            case SOUTHWEST -> "southwest.png";
+            case WEST -> "west.png";
+            case NORTHWEST -> "northwest.png";
+        };
     }
 
 }

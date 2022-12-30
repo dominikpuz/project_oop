@@ -1,8 +1,8 @@
 package org.example;
 
-public class Random extends GridObject{
-    public Random(int energyGrass, Vector2d position, AbstractWorldMap map,int n,int energyToReproduction,int energyToKid,SimulationEngine engine) {
-        super(energyGrass, position, map,n,energyToReproduction,energyToKid,engine);
+public class RandomGen extends GridObject{
+    public RandomGen(Vector2d position, AbstractWorldMap map, int n, int energyToReproduction, int energyToKid, SimulationEngine engine) {
+        super(position, map,n,energyToReproduction,energyToKid,engine);
     }
 
     @Override
