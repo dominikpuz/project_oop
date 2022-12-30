@@ -5,7 +5,7 @@ import java.util.Random;
     
 public class Animal extends IMapElement{
     private int[] genes;
-    private int energy;
+    public  int energy;
     private MapDirection direction;
     private List<IPositionChangeObserver> observers = new ArrayList<>();
     private int geneIndex;
@@ -16,7 +16,8 @@ public class Animal extends IMapElement{
     public Animal(Vector2d position, int energy, int[] genes, AbstractWorldMap map) {
         super(position);
         this.map = map;
-        geneIndex = 0;
+        Random generator = new Random();
+        geneIndex = generator.nextInt(genes.length-1);
         this.energy = energy;
         direction = randomDirection();
         this.genes = genes;
@@ -38,11 +39,18 @@ public class Animal extends IMapElement{
     public void  addEnergy(int energyToAdd){
         energy+=energyToAdd;
     }
-    
+    public void  addKids(){
+        kids+=1;
+    }
+    public void  addDays(){
+        days+=1;
+    }
     public void setPosition(Vector2d position) {
         this.position = position;
     }
-    
+    public int[] getTable(){
+        return genes;
+    }
     public MapDirection getDirection() {
         return direction;
     }
@@ -73,19 +81,25 @@ public class Animal extends IMapElement{
             default -> null;
         };
     }
+    public void  reduceEnergy(int a){
+        energy=energy-a;
+
+    }
 
     public void move() {
         direction = direction.rotate(genes[geneIndex]);
         Vector2d tempPosition = map.moveTo(position.add(direction.toUnitVector()), this);
         if (!tempPosition.equals(position)) {
             for(IPositionChangeObserver observer:observers){
-                observer.positionChanged(tempPosition, position);
+                observer.positionChanged(position, tempPosition,this);
             }
             position = tempPosition;
         }
         geneIndex = (geneIndex + 1) % genes.length;
         energy--;
         days++;
+
 //        TODO check for death
     }
+
 }

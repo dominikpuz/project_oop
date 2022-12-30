@@ -6,12 +6,13 @@ import java.util.HashMap;
 public abstract class AbstractWorldMap implements IPositionChangeObserver {
     protected HashMap<Vector2d, GridObject> objectsOnMap;
     MapBoundary mapBoundary;
-    int energyGrass;
-    int readyToReproduction;
+
 
     protected int width;
     protected int height;
-
+    public void addGridObject(GridObject grid){
+        objectsOnMap.put(grid.position(),grid);
+    }
     public AbstractWorldMap(int width, int height) {
         objectsOnMap = new HashMap<>();
         this.width = width;
@@ -19,7 +20,9 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver {
     }
 
     @Override
-    public void positionChanged(Vector2d oldPosition, Vector2d newPosition) {
+    public void positionChanged(Vector2d oldPosition, Vector2d newPosition,Animal animal) {
+        objectsOnMap.get(oldPosition).removeAnimal(animal);
+        objectsOnMap.get(newPosition).addAnimal(animal);
 
     }
 
@@ -57,5 +60,6 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver {
             x.feedAnimal();
         }
     }
+
 
 }
