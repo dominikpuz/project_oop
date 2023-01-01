@@ -13,10 +13,14 @@ public class SimulationEngine implements  AnimalObserver, Runnable {
     private List<Animal> animals;
     private AbstractWorldMap map;
     private Simulation mapObserver;
-    public SimulationEngine(int mapType, int randomType, int energyGrass, int numberOfGrass, int numberOfAnimals, int n, int energyOfAnimal, int readytoReproduction,int energyToKid,int height,int width, Simulation mapObserver) {
+    private int moveDelay;
+    private Simulation app;
+    public SimulationEngine(int mapType, int randomType, int energyGrass, int numberOfGrass, int numberOfAnimals, int n, int energyOfAnimal, int readytoReproduction,int energyToKid,int height,int width, Simulation mapObserver ,int moveDelay, Simulation app) {
         this.energyGrass = energyGrass;
         this.numberOfAnimals = numberOfAnimals;
         this.numberOfGrass = numberOfGrass;
+        this.app=app;
+        this.moveDelay=moveDelay;
         if (mapType == 0) {
             map = new Globe(width, height);
         } else {
@@ -91,10 +95,15 @@ public class SimulationEngine implements  AnimalObserver, Runnable {
 
     @Override
     public void run() {
-        for (int i = 0; i < 5; i++) {
-
+        for (int i = 0; i < 1; i++) {
+            mapObserver.updateMap();
             map.removeDeadAnimals();
-//        mapObserver.updateMap();
+            try {
+                Thread.sleep(this.moveDelay);
+            }catch(InterruptedException e){
+                e.printStackTrace();
+            }
+
             List<Vector2d> moves = new ArrayList<>();
             for (Animal animal :
                     animals) {
@@ -102,20 +111,49 @@ public class SimulationEngine implements  AnimalObserver, Runnable {
                 if (!moves.contains(animal.getPosition())) {
                     moves.add(animal.position);
                 }
-//            mapObserver.updateMap();
+
+
+
+            }
+            mapObserver.updateMap();
+            try {
+                Thread.sleep(this.moveDelay);
+            }catch(InterruptedException e){
+                e.printStackTrace();
             }
             for (Vector2d position :
                     moves) {
                 ((GridObject) map.objectAt(position)).feedAnimal();
             }
-//        mapObserver.updateMap();
+            mapObserver.updateMap();
+            try {
+                Thread.sleep(this.moveDelay);
+            }catch(InterruptedException e){
+                e.printStackTrace();
+            }
+
+
             for (Vector2d position :
                     moves) {
                 ((GridObject) map.objectAt(position)).Reproduction();
             }
-//        mapObserver.updateMap();
+            mapObserver.updateMap();
+            try {
+                Thread.sleep(this.moveDelay);
+            }catch(InterruptedException e){
+                e.printStackTrace();
+            }
+
+
             spawnGrass();
             mapObserver.updateMap();
+
+            try {
+                Thread.sleep(this.moveDelay);
+            }catch(InterruptedException e){
+                e.printStackTrace();
+            }
+
         }
     }
 }
