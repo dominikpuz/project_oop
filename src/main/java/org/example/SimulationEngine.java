@@ -95,9 +95,9 @@ public class SimulationEngine implements  AnimalObserver, Runnable {
 
     @Override
     public void run() {
-        for (int i = 0; i < 1; i++) {
-            mapObserver.updateMap();
+        for (int i = 0; i < 2; i++) {
             map.removeDeadAnimals();
+            mapObserver.updateMap();
             try {
                 Thread.sleep(this.moveDelay);
             }catch(InterruptedException e){
@@ -110,16 +110,13 @@ public class SimulationEngine implements  AnimalObserver, Runnable {
                 animal.move();
                 if (!moves.contains(animal.getPosition())) {
                     moves.add(animal.position);
+                    mapObserver.updateMap();
+                    try {
+                        Thread.sleep(this.moveDelay);
+                    } catch(InterruptedException e){
+                        e.printStackTrace();
+                    }
                 }
-
-
-
-            }
-            mapObserver.updateMap();
-            try {
-                Thread.sleep(this.moveDelay);
-            }catch(InterruptedException e){
-                e.printStackTrace();
             }
             for (Vector2d position :
                     moves) {
@@ -131,8 +128,6 @@ public class SimulationEngine implements  AnimalObserver, Runnable {
             }catch(InterruptedException e){
                 e.printStackTrace();
             }
-
-
             for (Vector2d position :
                     moves) {
                 ((GridObject) map.objectAt(position)).Reproduction();
@@ -143,8 +138,6 @@ public class SimulationEngine implements  AnimalObserver, Runnable {
             }catch(InterruptedException e){
                 e.printStackTrace();
             }
-
-
             spawnGrass();
             mapObserver.updateMap();
 

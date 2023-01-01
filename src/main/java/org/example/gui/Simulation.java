@@ -48,7 +48,7 @@ public class Simulation extends Application {
         VBox container = new VBox(menu, content);
         scene = new Scene(container, 700, 600);
         SimulationEngine engine = new SimulationEngine(0, 1, 10, 5, 10, 7,
-                20, 15, 10, 10,10, this,2000,this);
+                20, 15, 10, 10,10, this,500,this);
         map = engine.getMap();
         engineThread = new Thread(engine);
         engineThread.start();
@@ -66,6 +66,7 @@ public class Simulation extends Application {
 
     public void updateMap() {
         Platform.runLater(() -> {
+            grid.getChildren().clear();
             int width = map.getWidth();
             int height = map.getHeight();
 
