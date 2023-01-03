@@ -2,6 +2,8 @@ package org.example;
 
 import org.example.gui.Simulation;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -95,7 +97,27 @@ public class SimulationEngine implements  AnimalObserver, Runnable {
 
     @Override
     public void run() {
-        for (int i = 0; i < 2; i++) {
+        FileWriter myWriter = null;
+        try {
+            myWriter = new FileWriter("filename.txt");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            myWriter = new FileWriter("filename.txt");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        for (int i = 0; i < 40; i++) {
+
+            try {
+                myWriter.write("Files in Java might be tricky, but it is fun enough!");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+
+
             map.removeDeadAnimals();
             mapObserver.updateMap();
             try {
@@ -147,6 +169,11 @@ public class SimulationEngine implements  AnimalObserver, Runnable {
                 e.printStackTrace();
             }
 
+        }
+        try {
+            myWriter.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

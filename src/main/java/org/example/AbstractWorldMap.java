@@ -96,6 +96,7 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver {
     public void removeDeadAnimals() {
         for (GridObject x : objectsOnMap.values()){
             x.deadAnimal();
+
         }
     }
 

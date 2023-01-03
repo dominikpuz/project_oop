@@ -69,14 +69,21 @@ public abstract class GridObject  {
 
 
     public void deadAnimal() {
+        boolean flag = false;
         for (Animal x : animalsOnGrid) {
             if (x.getEnergy() <= 0) {
-                animalsOnGrid.remove(x);
+                this.removeAnimal(x);
+                flag=true;
                 for (AnimalObserver observer : observers) {
                     observer.removeAnimal(x);
                 }
+                break;
             }
         }
+        if(flag){
+            deadAnimal();
+        }
+
     }
     public int getGrassProbability() {
         return grassProbability;
