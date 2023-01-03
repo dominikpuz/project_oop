@@ -4,17 +4,22 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.example.*;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Simulation extends Application {
     private GridPane grid;
@@ -24,44 +29,81 @@ public class Simulation extends Application {
     private final int moveDelay = 300;
 
     Thread engineThread;
+    private List<Node> ElementOfSetting = new ArrayList<>();
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setScene(scene);
         primaryStage.show();
     }
+    private TextField create(String text) {
+        Text title = new Text(text);
+        TextField textField = new TextField();
+        HBox hBox = new HBox(10, title, textField);
+        hBox.setAlignment(Pos.BASELINE_CENTER);
+        ElementOfSetting.add(hBox);
+        return textField;
+    }
+
 
     @Override
     public void init() throws Exception {
+
+        TextField height = create("Height: ");
+        height.setText("10");
+        TextField width = create("Width: ");
+        width.setText("10");
+        TextField mapType = create("Type of map: ");
+        mapType.setText("0");
+        TextField randomType = create("Type of gene generation: ");
+        randomType.setText("0");
+        TextField energyGrass = create("Energy from plant: ");
+        energyGrass.setText("10");
+        TextField numberOfGrass = create("Number of grass: ");
+        numberOfGrass.setText("10");
+        TextField numberOfAnimals = create("Number of animals: ");
+        numberOfAnimals.setText("10");
+        TextField n = create("Length of gen: ");
+        n.setText("7");
+        TextField energyOfAnimal = create("Start Energy: ");
+        energyOfAnimal.setText("10");
+        TextField readyToReproduction = create("Energy to reproduction: ");
+        readyToReproduction.setText("10");
+        TextField energyToKid = create("Energy to kid: ");
+        energyToKid.setText("5");
         Button startButton = new Button("Start");
         Button stopButton = new Button("Stop");
         HBox menu = new HBox(startButton, stopButton);
-        startButton.setDisable(true);
         grid = new GridPane();
         ScrollPane sp = new ScrollPane(grid);
         sp.setFitToWidth(true);
         sp.setFitToHeight(true);
-        Label test = new Label("Test");
+        Label test = new Label("Setting");
         VBox stats = new VBox(test);
         stats.setMinWidth(100);
+        for (Node elementOfVBox: ElementOfSetting) {
+            stats.getChildren().add(elementOfVBox);
+        }
         HBox content = new HBox(stats, sp);
         VBox container = new VBox(menu, content);
         scene = new Scene(container, 700, 600);
-        SimulationEngine engine = new SimulationEngine(0, 1, 10, 5, 10, 7,
-                20, 15, 10, 10,10, this,500,this);
-        map = engine.getMap();
-        engineThread = new Thread(engine);
-        engineThread.start();
+        startButton.setOnAction((event) -> {
+            try {
+                SimulationEngine engine = new SimulationEngine(Integer.valueOf(mapType.getText()),Integer.valueOf(randomType.getText()) ,Integer.valueOf(energyGrass.getText()), Integer.valueOf(numberOfGrass.getText()), Integer.valueOf(numberOfAnimals.getText()), Integer.valueOf(n.getText()), Integer.valueOf(energyOfAnimal.getText()),
+                        Integer.valueOf(readyToReproduction.getText()), Integer.valueOf(energyToKid.getText()), Integer.valueOf(height.getText()), Integer.valueOf(width.getText()),this, 500,this);
+                map = engine.getMap();
+                engineThread = new Thread(engine);
+                engineThread.start();
+            } catch (NumberFormatException e) {
+                System.out.println("Niepoprawne dane");
+            }
+        });
 //        startButton.setOnAction(e -> {
 //            engineThread.resume();
 //            stopButton.setDisable(false);
 //            startButton.setDisable(true);
 //        });
-//        stopButton.setOnAction(e -> {
-//            engineThread.suspend();
-//            stopButton.setDisable(true);
-//            startButton.setDisable(false);
-//        });
+//
     }
 
     public void updateMap() {
