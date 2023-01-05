@@ -3,10 +3,11 @@ package org.example;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public abstract class AbstractWorldMap implements IPositionChangeObserver {
-    protected HashMap<Vector2d, GridObject> objectsOnMap;
+    protected ConcurrentHashMap<Vector2d, GridObject> objectsOnMap;
     int energyGrass;
     int readyToReproduction;
 
@@ -14,7 +15,7 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver {
     protected int height;
 
     public AbstractWorldMap(int width, int height) {
-        objectsOnMap = new HashMap<>();
+        objectsOnMap = new ConcurrentHashMap<>();
         this.width = width;
         this.height = height;
     }

@@ -1,43 +1,54 @@
 package org.example;
 
+import javafx.application.Platform;
+import javafx.geometry.HPos;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import org.example.gui.Simulation;
 
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class SimulationEngine implements  AnimalObserver, Runnable {
-    private int energyGrass;
-    private int numberOfGrass;
-    private int numberOfAnimals;
-    private List<Animal> animals;
-    private AbstractWorldMap map;
-    private Simulation mapObserver;
-    private int moveDelay;
-    private Simulation app;
-    public SimulationEngine(int mapType, int randomType, int energyGrass, int numberOfGrass, int numberOfAnimals, int n, int energyOfAnimal, int readytoReproduction,int energyToKid,int height,int width, Simulation mapObserver ,int moveDelay, Simulation app) {
+public class SimulationEngine implements AnimalObserver, Runnable {
+    private final int energyGrass;
+    private final int numberOfGrass;
+    private final List<Animal> animals;
+    private final AbstractWorldMap map;
+    private final int moveDelay;
+    private final int gridSize = 50;
+    private GridPane grid;
+    private VBox stats;
+    private boolean isPaused;
+    private int day;
+
+    public SimulationEngine(int mapType, int randomType, int energyGrass, int numberOfGrass, int numberOfAnimals, int n, int energyOfAnimal, int readytoReproduction, int energyToKid, int height, int width, int moveDelay, GridPane grid, VBox stats, Textures textures) {
+        this.isPaused = true;
         this.energyGrass = energyGrass;
-        this.numberOfAnimals = numberOfAnimals;
         this.numberOfGrass = numberOfGrass;
-        this.app=app;
-        this.moveDelay=moveDelay;
+        this.moveDelay = moveDelay;
+        this.grid = grid;
+        this.stats = stats;
+        day = 1;
         if (mapType == 0) {
             map = new Globe(width, height);
         } else {
             map = new HellsPortal(width, height, energyToKid);
         }
-        this.mapObserver = mapObserver;
         Random rand = new Random();
         this.animals = new ArrayList<>();
-        for(int i=0;i<width;i++){
-            for(int j=0;j<height;j++){
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
                 if (randomType == 0) {
-                    GridObject grid=new PartRandom(energyGrass,new Vector2d(i,j),map,n,readytoReproduction,energyToKid,this);
-                    map.addGridObject(grid);
+                    GridObject gridObject = new PartRandom(energyGrass, new Vector2d(i, j), map, n, readytoReproduction, energyToKid, this, textures);
+                    map.addGridObject(gridObject);
                 } else {
-                    map.addGridObject(new RandomGen(new Vector2d(i,j),map,n,readytoReproduction,energyToKid,this));
+                    map.addGridObject(new RandomGen(new Vector2d(i, j), map, n, readytoReproduction, energyToKid, this, textures));
                 }
             }
         }
@@ -48,8 +59,10 @@ public class SimulationEngine implements  AnimalObserver, Runnable {
             animals.add(animal);
             map.place(animal);
         }
-        mapObserver.updateMap();
+        updateMap();
     }
+
+
 
     public AbstractWorldMap getMap() {
         return map;
@@ -95,6 +108,70 @@ public class SimulationEngine implements  AnimalObserver, Runnable {
         }
     }
 
+    public void updateMap() {
+        Platform.runLater(() -> {
+            stats.getChildren().clear();
+            Label title = new Label("Statistics");
+            stats.getChildren().add(title);
+            Label day = new Label(String.format("Day: " + this.day));
+            Label numberOfAnimals = new Label(String.format("Number of animals: " + animals.size()));
+            stats.getChildren().add(day);
+            stats.getChildren().add(numberOfAnimals);
+            grid.getChildren().clear();
+            int width = map.getWidth();
+            int height = map.getHeight();
+
+            for (int i = 0; i <= width; i++) {
+                for (int j = 0; j <= height; j++) {
+                    if (i == 0 && j == 0) {
+                        Label label = new Label("y\\x");
+                        label.setMinWidth(gridSize);
+                        label.setMinHeight(gridSize);
+                        label.setStyle("-fx-border-color: black; -fx-border-width: 1 1 1 1");
+                        label.setAlignment(Pos.CENTER);
+                        GridPane.setHalignment(label, HPos.CENTER);
+                        GridPane.setConstraints(label, 0, 0);
+                        grid.getChildren().add(label);
+                    } else if (i == 0) {
+                        VBox field = new VBox(new Label(Integer.toString(j - 1)));
+                        field.setStyle("-fx-border-color: black; -fx-border-width: 1 1 1 1");
+                        field.setAlignment(Pos.CENTER);
+                        field.setMinWidth(gridSize);
+                        field.setMinHeight(gridSize);
+                        GridPane.setConstraints(field, 0, j);
+                        grid.getChildren().add(field);
+                    } else if (j == 0) {
+                        VBox field = new VBox(new Label(Integer.toString(i - 1)));
+                        field.setStyle("-fx-border-color: black; -fx-border-width: 1 1 1 1");
+                        field.setAlignment(Pos.CENTER);
+                        field.setMinWidth(gridSize);
+                        field.setMinHeight(gridSize);
+                        GridPane.setConstraints(field, i, 0);
+                        grid.getChildren().add(field);
+                    } else {
+                        GridObject object = (GridObject) map.objectAt(new Vector2d(i - 1, j - 1));
+                        VBox field;
+                        field = object.getBox();
+                        field.setStyle("-fx-border-color: black; -fx-border-width: 1 1 1 1");
+                        field.setAlignment(Pos.CENTER);
+                        field.setMinWidth(gridSize);
+                        field.setMinHeight(gridSize);
+                        GridPane.setConstraints(field, i, j);
+                        grid.getChildren().add(field);
+                    }
+                }
+            }
+        });
+    }
+
+    public void pause() {
+        isPaused = true;
+    }
+
+    public void resume() {
+        isPaused = false;
+    }
+
     @Override
     public void run() {
         FileWriter myWriter = null;
@@ -108,23 +185,16 @@ public class SimulationEngine implements  AnimalObserver, Runnable {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        for (int i = 0; i < 40; i++) {
+        while (animals.size() > 0) {
+            while (isPaused) {
 
+            }
             try {
                 myWriter.write("Files in Java might be tricky, but it is fun enough!");
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-
-
-
             map.removeDeadAnimals();
-            mapObserver.updateMap();
-            try {
-                Thread.sleep(this.moveDelay);
-            }catch(InterruptedException e){
-                e.printStackTrace();
-            }
 
             List<Vector2d> moves = new ArrayList<>();
             for (Animal animal :
@@ -132,43 +202,25 @@ public class SimulationEngine implements  AnimalObserver, Runnable {
                 animal.move();
                 if (!moves.contains(animal.getPosition())) {
                     moves.add(animal.position);
-                    mapObserver.updateMap();
-                    try {
-                        Thread.sleep(this.moveDelay);
-                    } catch(InterruptedException e){
-                        e.printStackTrace();
-                    }
                 }
             }
             for (Vector2d position :
                     moves) {
                 ((GridObject) map.objectAt(position)).feedAnimal();
             }
-            mapObserver.updateMap();
-            try {
-                Thread.sleep(this.moveDelay);
-            }catch(InterruptedException e){
-                e.printStackTrace();
-            }
+
             for (Vector2d position :
                     moves) {
                 ((GridObject) map.objectAt(position)).Reproduction();
             }
-            mapObserver.updateMap();
-            try {
-                Thread.sleep(this.moveDelay);
-            }catch(InterruptedException e){
-                e.printStackTrace();
-            }
             spawnGrass();
-            mapObserver.updateMap();
-
+            updateMap();
             try {
                 Thread.sleep(this.moveDelay);
-            }catch(InterruptedException e){
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
+            day++;
         }
         try {
             myWriter.close();

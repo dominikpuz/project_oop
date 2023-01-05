@@ -5,15 +5,21 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.lang.Math;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 
-public abstract class GridObject  {
-    private List<Animal> animalsOnGrid;
+public abstract class GridObject {
+
+    private Textures textures;
+    private CopyOnWriteArrayList<Animal> animalsOnGrid;
     private Grass grass;
     private Vector2d position;
     private AbstractWorldMap map;
@@ -23,8 +29,9 @@ public abstract class GridObject  {
     private int energyToKid;
     private int grassProbability;
 
-    public GridObject(Vector2d position, AbstractWorldMap map, int n, int energyToReproduction,int energyToKid,SimulationEngine engine) {
-        animalsOnGrid = new ArrayList<>();
+    public GridObject(Vector2d position, AbstractWorldMap map, int n, int energyToReproduction, int energyToKid, SimulationEngine engine, Textures textures)  {
+        this.textures = textures;
+        animalsOnGrid = new CopyOnWriteArrayList<>();
         grass = null;
         this.grassProbability = 20;
         this.position = position;
@@ -32,28 +39,26 @@ public abstract class GridObject  {
         this.n = n;
         this.energyToReproduction = energyToReproduction;
         observers.add(engine);
-        this.energyToKid=energyToKid;
+        this.energyToKid = energyToKid;
 
 
     }
 
-    public void addObserver(AnimalObserver observer){
+    public void addObserver(AnimalObserver observer) {
         observers.add(observer);
     }
 
-    public VBox getBox() throws FileNotFoundException {
+    public VBox getBox() {
         VBox box = new VBox();
         if (grass != null) {
-            Image image = new Image(new FileInputStream("src/main/resources/" + grass.getTexture()));
-            ImageView imageView = new ImageView(image);
+            ImageView imageView = new ImageView(textures.grassTexture);
             imageView.setFitHeight(20);
             imageView.setFitWidth(20);
             box.getChildren().add(imageView);
         }
         for (Animal animal :
                 animalsOnGrid) {
-            Image image = new Image(new FileInputStream("src/main/resources/" + animal.getTexture()));
-            ImageView imageView = new ImageView(image);
+            ImageView imageView = new ImageView(textures.textures.get(animal.getTexture()));
             imageView.setFitHeight(20);
             imageView.setFitWidth(20);
             VBox animalBox = new VBox(imageView, new Label(Integer.toString(animal.getEnergy())));
@@ -73,18 +78,19 @@ public abstract class GridObject  {
         for (Animal x : animalsOnGrid) {
             if (x.getEnergy() <= 0) {
                 this.removeAnimal(x);
-                flag=true;
+                flag = true;
                 for (AnimalObserver observer : observers) {
                     observer.removeAnimal(x);
                 }
                 break;
             }
         }
-        if(flag){
+        if (flag) {
             deadAnimal();
         }
 
     }
+
     public int getGrassProbability() {
         return grassProbability;
     }
@@ -105,7 +111,7 @@ public abstract class GridObject  {
         animalsOnGrid.add(animalToAdd);
     }
 
-    public Animal bestAnimal(ArrayList<Animal> tmp) {
+    public Animal bestAnimal(CopyOnWriteArrayList<Animal> tmp) {
         Animal maxAnimal = null;
         int maxEnergy = 0;
         int maxDays = 0;
@@ -192,17 +198,16 @@ public abstract class GridObject  {
 
     public void feedAnimal() {
         if (grass != null && animalsOnGrid.size() > 0) {
-            bestAnimal((ArrayList<Animal>) animalsOnGrid).addEnergy(grass.getEnergy());
+            bestAnimal(animalsOnGrid).addEnergy(grass.getEnergy());
             grass = null;
         }
     }
-
 
     abstract int[] createRandomGen(int[] genTable);
 
 
     public void Reproduction() {
-        ArrayList<Animal> tmp = new ArrayList<>(animalsOnGrid);
+        CopyOnWriteArrayList<Animal> tmp = new CopyOnWriteArrayList<>(animalsOnGrid);
         Animal animal1;
         Animal animal2;
         while (true) {
@@ -220,7 +225,7 @@ public abstract class GridObject  {
         }
     }
 
-    public Vector2d position(){
+    public Vector2d position() {
         return this.position;
     }
 }
