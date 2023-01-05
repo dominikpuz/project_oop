@@ -101,16 +101,14 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver {
         }
     }
 
-    public void reproduction(){
+    public int freeplace(){
+        int sum=0;
         for (GridObject x : objectsOnMap.values()){
-            x.Reproduction ();
+            sum+=x.freeplace();
+
         }
+        return sum;
     }
-    
-    public void feedAnimals(){
-        for (GridObject x : objectsOnMap.values()){
-            x.feedAnimal();
-        }
-    }
+
 
 }

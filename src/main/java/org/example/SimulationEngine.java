@@ -12,6 +12,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -26,8 +27,9 @@ public class SimulationEngine implements AnimalObserver, Runnable {
     private VBox stats;
     private boolean isPaused;
     private int day;
+    private Statisctic statisctic;
 
-    public SimulationEngine(int mapType, int randomType, int energyGrass, int numberOfGrass, int numberOfAnimals, int n, int energyOfAnimal, int readytoReproduction, int energyToKid, int height, int width, int moveDelay, GridPane grid, VBox stats, Textures textures) {
+    public SimulationEngine(int mapType, int randomType, int energyGrass, int numberOfGrass, int numberOfAnimals, int n, int energyOfAnimal, int readytoReproduction, int energyToKid, int height, int width, int moveDelay, GridPane grid, VBox stats, Textures textures, int maxMutation, int minMutation) {
         this.isPaused = true;
         this.energyGrass = energyGrass;
         this.numberOfGrass = numberOfGrass;
@@ -41,14 +43,16 @@ public class SimulationEngine implements AnimalObserver, Runnable {
             map = new HellsPortal(width, height, energyToKid);
         }
         Random rand = new Random();
+        int[] table = new int[n];
+        this.statisctic=new Statisctic(numberOfAnimals,0,0,table,10,0,energyOfAnimal);
         this.animals = new ArrayList<>();
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 if (randomType == 0) {
-                    GridObject gridObject = new PartRandom(energyGrass, new Vector2d(i, j), map, n, readytoReproduction, energyToKid, this, textures);
+                    GridObject gridObject = new PartRandom(energyGrass, new Vector2d(i, j), map, n, readytoReproduction, energyToKid, this, textures, maxMutation, minMutation, statisctic);
                     map.addGridObject(gridObject);
                 } else {
-                    map.addGridObject(new RandomGen(new Vector2d(i, j), map, n, readytoReproduction, energyToKid, this, textures));
+                    map.addGridObject(new RandomGen(new Vector2d(i, j), map, n, readytoReproduction, energyToKid, this, textures, maxMutation, minMutation, statisctic));
                 }
             }
         }
@@ -103,6 +107,7 @@ public class SimulationEngine implements AnimalObserver, Runnable {
                 if (object.getGrassProbability() >= rand.nextInt(1, 100)) {
                     object.spawnGrass(position, energyGrass);
                     spawnedGrass += 1;
+                    this.statisctic.addNewGrass(1);
                 }
             }
         }
@@ -227,5 +232,35 @@ public class SimulationEngine implements AnimalObserver, Runnable {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void updateEnergy(){
+        this.statisctic.newEnergy();
+        this.statisctic.setNumberOfAnimals();
+        for (Animal animal :
+                animals) {
+            this.statisctic.add(animal.getEnergy());
+            this.statisctic.newAnimal();
+        }
+
+    }
+    public void gen(){
+        int maxi=1;
+        for (Animal animal :
+                animals) {
+            int number=0;
+            for (Animal animal2 :
+                    animals) {
+                if(Arrays.equals(animal.getTable(), animal2.getTable()) && animal.getTable()!=animal2.getTable()){
+                    number+=1;
+                }
+            }
+            if(maxi<number){
+                maxi=number;
+
+            }
+
+        }
+
     }
 }

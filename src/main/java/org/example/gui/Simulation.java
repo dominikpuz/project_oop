@@ -19,6 +19,7 @@ import org.example.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Simulation extends Application {
@@ -38,7 +39,11 @@ public class Simulation extends Application {
         ElementOfSetting.add(hBox);
         return textField;
     }
-
+    public void  addElements(VBox box){
+        for (Node element: ElementOfSetting) {
+            box.getChildren().add(element);
+        }
+    }
 
     @Override
     public void init() throws Exception {
@@ -90,7 +95,7 @@ public class Simulation extends Application {
                         Integer.parseInt(numberOfGrass.getText()), Integer.parseInt(numberOfAnimals.getText()),
                         Integer.parseInt(n.getText()), Integer.parseInt(energyOfAnimal.getText()),
                         Integer.parseInt(readyToReproduction.getText()), Integer.parseInt(energyToKid.getText()),
-                        Integer.parseInt(height.getText()), Integer.parseInt(width.getText()), 50, grid, stats, textures);
+                        Integer.parseInt(height.getText()), Integer.parseInt(width.getText()), 50, grid, stats, textures, Integer.parseInt(maxMutation.getText()), Integer.parseInt(minMutation.getText()));
                 createSimulationView(engine, grid, stats);
             } catch (NumberFormatException e) {
                 System.out.println("Niepoprawne dane");

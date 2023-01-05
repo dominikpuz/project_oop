@@ -28,8 +28,10 @@ public abstract class GridObject {
     private List<AnimalObserver> observers = new ArrayList<>();
     private int energyToKid;
     private int grassProbability;
-
-    public GridObject(Vector2d position, AbstractWorldMap map, int n, int energyToReproduction, int energyToKid, SimulationEngine engine, Textures textures)  {
+    private int maxMutation;
+    private int minMutation;
+    private Statisctic statisctic;
+    public GridObject(Vector2d position, AbstractWorldMap map, int n, int energyToReproduction, int energyToKid, SimulationEngine engine, Textures textures, int maxMutation, int minMutation,Statisctic statistics)  {
         this.textures = textures;
         animalsOnGrid = new CopyOnWriteArrayList<>();
         grass = null;
@@ -40,8 +42,9 @@ public abstract class GridObject {
         this.energyToReproduction = energyToReproduction;
         observers.add(engine);
         this.energyToKid = energyToKid;
-
-
+        this.minMutation=minMutation;
+        this.maxMutation=maxMutation;
+        this.statisctic=statistics;
     }
 
     public void addObserver(AnimalObserver observer) {
@@ -82,6 +85,7 @@ public abstract class GridObject {
                 for (AnimalObserver observer : observers) {
                     observer.removeAnimal(x);
                 }
+                this.statisctic.deadAnimal(x.getDays());
                 break;
             }
         }
@@ -183,7 +187,7 @@ public abstract class GridObject {
                 genTable[j] = animal1.getTable()[j];
             }
         }
-        Animal newanimal = new Animal(animal2.getPosition(), 2 * energyToKid, this.createRandomGen(genTable), this.map);
+        Animal newanimal = new Animal(animal2.getPosition(), 2 * energyToKid, this.createRandomGen(genTable,this.maxMutation,this.minMutation), this.map);
         animal1.reduceEnergy(energyToKid);
         animal2.reduceEnergy(energyToKid);
         animal1.addDays();
@@ -200,10 +204,12 @@ public abstract class GridObject {
         if (grass != null && animalsOnGrid.size() > 0) {
             bestAnimal(animalsOnGrid).addEnergy(grass.getEnergy());
             grass = null;
+            this.stat.eatgrass();
         }
     }
 
-    abstract int[] createRandomGen(int[] genTable);
+
+    abstract int[] createRandomGen(int[] genTable,int maxMutation,int minMutation);
 
 
     public void Reproduction() {
@@ -228,4 +234,15 @@ public abstract class GridObject {
     public Vector2d position() {
         return this.position;
     }
+
+    public int freeplace(){
+        if(grass != null || animalsOnGrid.size() > 0){
+            return 0;
+        }
+        return 1;
+
+    }
+
+
+
 }
