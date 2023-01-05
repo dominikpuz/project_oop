@@ -2,19 +2,14 @@ package org.example;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.lang.Math;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CopyOnWriteArraySet;
+
 
 public abstract class GridObject {
 
@@ -204,7 +199,7 @@ public abstract class GridObject {
         if (grass != null && animalsOnGrid.size() > 0) {
             bestAnimal(animalsOnGrid).addEnergy(grass.getEnergy());
             grass = null;
-            this.stat.eatgrass();
+            this.statisctic.eatgrass();
         }
     }
 

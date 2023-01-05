@@ -49,7 +49,7 @@ public class SimulationEngine implements AnimalObserver, Runnable {
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 if (randomType == 0) {
-                    GridObject gridObject = new PartRandom(energyGrass, new Vector2d(i, j), map, n, readytoReproduction, energyToKid, this, textures, maxMutation, minMutation, statisctic);
+                    GridObject gridObject = new PartRandom(new Vector2d(i, j), map, n, readytoReproduction, energyToKid, this, textures, maxMutation, minMutation, statisctic);
                     map.addGridObject(gridObject);
                 } else {
                     map.addGridObject(new RandomGen(new Vector2d(i, j), map, n, readytoReproduction, energyToKid, this, textures, maxMutation, minMutation, statisctic));
