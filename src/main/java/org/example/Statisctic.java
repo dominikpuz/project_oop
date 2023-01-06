@@ -20,7 +20,14 @@ public class Statisctic {
         this.middleOfEnergy=middleOfEnergy;
         this.middleOfDead=middleOfDead;
         this.sumOfEnergy=energy*numberOfAnimals;
+        numberDayOfDead = 0;
+        numberOfDead = 0;
 
+    }
+
+    public String  getAverageLifetime() {
+        if (numberOfDead == 0) { return "0"; }
+        return String.format("%.2f", (double) numberDayOfDead/numberOfDead);
     }
     public void newAnimal(){
         this.numberOfAnimals+=1;
@@ -29,7 +36,6 @@ public class Statisctic {
     public void deadAnimal(int days){
         this.numberOfDead+=1;
         this.numberDayOfDead+=days;
-
 
     }
     public void add(int energy){
@@ -65,6 +71,5 @@ public class Statisctic {
     public int   getNumberOfFree(){
         return numberOfFree;
     }
-
 
 }

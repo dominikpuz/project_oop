@@ -3,108 +3,242 @@ package org.example.gui;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.HPos;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.example.*;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+
+import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class Simulation extends Application {
     private Scene scene;
-    private final List<Node> ElementOfSetting = new ArrayList<>();
+    private int simulationCounter = 0;
+    TextField heightInput;
+    TextField widthInput;
+    final String[] mapType = new String[1];
+    final String[] mutationType = new String[1];
+    TextField minMutationInput;
+    TextField maxMutationInput;
+    TextField startGrassInput;
+    TextField numberOfGrassInput;
+    TextField numberOfAnimalsInput;
+    TextField genomeLengthInput;
+    TextField energyOfAnimalInput;
+    TextField energyGrassInput;
+    TextField readyToReproductionInput;
+    TextField energyToKidInput;
+    ChoiceBox<String> mutationTypeBox;
+    ChoiceBox<String> mapTypeBox;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setScene(scene);
+        primaryStage.setTitle("Main menu");
         primaryStage.show();
-    }
-    private TextField create(String text) {
-        Text title = new Text(text);
-        TextField textField = new TextField();
-        HBox hBox = new HBox(10, title, textField);
-        hBox.setAlignment(Pos.BASELINE_CENTER);
-        ElementOfSetting.add(hBox);
-        return textField;
-    }
-    public void  addElements(VBox box){
-        for (Node element: ElementOfSetting) {
-            box.getChildren().add(element);
-        }
     }
 
     @Override
     public void init() throws Exception {
-        TextField height = create("Height: ");
-        height.setText("10");
-        TextField width = create("Width: ");
-        width.setText("10");
-        TextField mapType = create("Type of map: ");
-        mapType.setText("0");
-        TextField randomType = create("Type of gene generation: ");
-        randomType.setText("0");
-        TextField startGrass = create("Number of grass on start: ");
-        startGrass.setText("0");
-        TextField energyGrass = create("Energy from plant: ");
-        energyGrass.setText("10");
-        TextField numberOfGrass = create("Number of grass each day: ");
-        numberOfGrass.setText("5");
-        TextField numberOfAnimals = create("Number of animals: ");
-        numberOfAnimals.setText("10");
-        TextField n = create("Length of gen: ");
-        n.setText("7");
-        TextField minMutation = create("Min number of mutations: ");
-        minMutation.setText("0");
-        TextField maxMutation = create("Max number of mutations: ");
-        maxMutation.setText("1");
-        TextField energyOfAnimal = create("Start Energy: ");
-        energyOfAnimal.setText("10");
-        TextField readyToReproduction = create("Energy to reproduction: ");
-        readyToReproduction.setText("10");
-        TextField energyToKid = create("Energy to kid: ");
-        energyToKid.setText("5");
-        Button startButton = new Button("Start simulation");
+//        Map properties
+        Text heightLabel = new Text("Height: ");
+        heightInput = new TextField("10");
+        Text widthLabel = new Text("Width: ");
+        widthInput = new TextField("10");
+        Text mapVariantLabel = new Text("Map variant: ");
+        mapTypeBox = new ChoiceBox<>();
+        mapType[0] = "Globe";
+        mapTypeBox.getItems().add("Globe");
+        mapTypeBox.getItems().add("Hell's portal");
+        mapTypeBox.setValue("Globe");
+        mapTypeBox.setOnAction(e -> {
+            mapType[0] = mapTypeBox.getValue();
 
+        });
+        VBox mapPropertiesLabels = new VBox(15, heightLabel, widthLabel, mapVariantLabel);
+        mapPropertiesLabels.setAlignment(Pos.BASELINE_CENTER);
+        VBox mapPropertiesInput = new VBox(5, heightInput, widthInput, mapTypeBox);
+        HBox mapProperties = new HBox(mapPropertiesLabels, mapPropertiesInput);
+        mapProperties.setStyle("-fx-border-color: gray; -fx-border-width: 1 1 1 1");
+        mapProperties.setPadding(new Insets(10));
+        mapProperties.setPrefWidth(200);
+
+//        Mutation properties
+        mutationTypeBox = new ChoiceBox<>();
+        Text mutationVariantLabel = new Text("Mutation variant: ");
+        mutationType[0] = "Part random";
+        mutationTypeBox.getItems().add("Part random");
+        mutationTypeBox.getItems().add("Full random");
+        mutationTypeBox.setValue("Part random");
+        mutationTypeBox.setOnAction(e -> {
+            mutationType[0] = mutationTypeBox.getValue();
+        });
+        Text minMutationLabel = new Text("Min number of mutations: ");
+        minMutationInput = new TextField("0");
+        Text maxMutationLabel = new Text("Max number of mutations: ");
+        maxMutationInput = new TextField("1");
+        VBox mutationPropertiesLabels = new VBox(15, minMutationLabel, maxMutationLabel, mutationVariantLabel);
+        mutationPropertiesLabels.setAlignment(Pos.BASELINE_CENTER);
+        VBox mutationPropertiesInput = new VBox(5, minMutationInput, maxMutationInput, mutationTypeBox);
+        HBox mutationProperties = new HBox(mutationPropertiesLabels, mutationPropertiesInput);
+        mutationProperties.setStyle("-fx-border-color: gray; -fx-border-width: 1 1 1 1");
+        mutationProperties.setPadding(new Insets(10));
+        mutationProperties.setPrefWidth(280);
+
+//        Starting properties
+        Text startGrassLabel = new Text("Number of grass on start: ");
+        startGrassInput = new TextField("10");
+        Text numberOfGrassLabel = new Text("Number of grass each day: ");
+        numberOfGrassInput = new TextField("5");
+        Text numberOfAnimalsLabel = new Text("Number of animals: ");
+        numberOfAnimalsInput = new TextField("10");
+        Text genomeLengthLabel = new Text("Length of genome: ");
+        genomeLengthInput = new TextField("7");
+        VBox startingPropertiesLabels = new VBox(15, startGrassLabel, numberOfGrassLabel, numberOfAnimalsLabel, genomeLengthLabel);
+        startingPropertiesLabels.setAlignment(Pos.BASELINE_CENTER);
+        VBox startingPropertiesInput = new VBox(5, startGrassInput, numberOfGrassInput, numberOfAnimalsInput, genomeLengthInput);
+        HBox startingProperties = new HBox(startingPropertiesLabels, startingPropertiesInput);
+        startingProperties.setStyle("-fx-border-color: gray; -fx-border-width: 1 1 1 1");
+        startingProperties.setPadding(new Insets(10));
+        startingProperties.setPrefWidth(250);
+
+//        Energy properties
+        Text energyOfAnimalLabel = new Text("Starting energy of animal: ");
+        energyOfAnimalInput = new TextField("20");
+        Text energyGrassLabel = new Text("Energy from plant: ");
+        energyGrassInput = new TextField("10");
+        Text readyToReproductionLabel = new Text("Energy to reproduce: ");
+        readyToReproductionInput = new TextField("15");
+        Text energyToKidLabel = new Text("Energy to kid: ");
+        energyToKidInput = new TextField("10");
+        VBox energyPropertiesLabels = new VBox(15, energyOfAnimalLabel, energyGrassLabel, readyToReproductionLabel, energyToKidLabel);
+        energyPropertiesLabels.setAlignment(Pos.BASELINE_CENTER);
+        VBox energyPropertiesInput = new VBox(5, energyOfAnimalInput, energyGrassInput, readyToReproductionInput, energyToKidInput);
+        HBox energyProperties = new HBox(energyPropertiesLabels, energyPropertiesInput);
+        energyProperties.setPadding(new Insets(10));
+        energyProperties.setStyle("-fx-border-color: gray; -fx-border-width: 1 1 1 1");
+        energyProperties.setMaxWidth(200);
+
+//        Simulation properties
+        Text delayLabel = new Text("Animation delay: ");
+        TextField delayInput = new TextField("200");
+        Text csvLabel = new Text("Save to csv file ");
+        CheckBox saveToCsv = new CheckBox();
+        VBox simulationPropertiesLabels = new VBox(15, delayLabel, csvLabel);
+        energyPropertiesLabels.setAlignment(Pos.BASELINE_CENTER);
+        VBox simulationPropertiesInput = new VBox(5, delayInput, saveToCsv);
+        HBox simulationProperties = new HBox(simulationPropertiesLabels, simulationPropertiesInput);
+        simulationProperties.setStyle("-fx-border-color: gray; -fx-border-width: 1 1 1 1");
+        simulationProperties.setPadding(new Insets(10));
+        simulationPropertiesLabels.setMaxWidth(200);
+
+//        Load from file
+        Button chooseConfigurationButton = new Button("Choose configuration");
+        chooseConfigurationButton.setOnAction(e -> {
+            FileChooser chooseConfiguration = new FileChooser();
+            chooseConfiguration.setTitle("Choose configuration");
+            chooseConfiguration.setInitialDirectory(new File("configurations/"));
+            Stage fileStage = new Stage();
+            loadConfiguration(chooseConfiguration.showOpenDialog(fileStage));
+        });
+        HBox chooseConfiguration = new HBox(chooseConfigurationButton);
+        chooseConfiguration.setAlignment(Pos.CENTER);
+        chooseConfiguration.setStyle("-fx-border-color: gray; -fx-border-width: 1 1 1 1");
+
+        Button startButton = new Button("Start simulation");
         HBox menu = new HBox(startButton);
-        VBox settings = new VBox();
-        settings.setMinWidth(100);
-        for (Node elementOfVBox: ElementOfSetting) {
-            settings.getChildren().add(elementOfVBox);
-        }
-        VBox container = new VBox(menu, settings);
-        scene = new Scene(container, 700, 600);
+        menu.setPadding(new Insets(20));
+        menu.setAlignment(Pos.TOP_RIGHT);
+        GridPane settings = new GridPane();
+        GridPane.setConstraints(mapProperties,0,0);
+        settings.getChildren().add(mapProperties);
+        GridPane.setConstraints(mutationProperties,1,0);
+        settings.getChildren().add(mutationProperties);
+        GridPane.setConstraints(startingProperties,2,0);
+        settings.getChildren().add(startingProperties);
+        GridPane.setConstraints(energyProperties,0,1);
+        settings.getChildren().add(energyProperties);
+        settings.setPadding(new Insets(10));
+        GridPane.setConstraints(simulationProperties,1,1);
+        settings.getChildren().add(simulationProperties);
+        GridPane.setConstraints(chooseConfiguration,2,1);
+        settings.getChildren().add(chooseConfiguration);
+        settings.setPadding(new Insets(10));
+
+        VBox container = new VBox(settings, menu);
+        scene = new Scene(container, 750, 400);
         Textures textures = new Textures();
         startButton.setOnAction((event) -> {
             try {
+                simulationCounter++;
                 GridPane grid = new GridPane();
                 VBox stats = new VBox();
-                SimulationEngine engine = new SimulationEngine(Integer.parseInt(mapType.getText()),
-                        Integer.parseInt(randomType.getText()) ,Integer.parseInt(energyGrass.getText()),
-                        Integer.parseInt(numberOfGrass.getText()), Integer.parseInt(numberOfAnimals.getText()),
-                        Integer.parseInt(n.getText()), Integer.parseInt(energyOfAnimal.getText()),
-                        Integer.parseInt(readyToReproduction.getText()), Integer.parseInt(energyToKid.getText()),
-                        Integer.parseInt(height.getText()), Integer.parseInt(width.getText()), 50, grid, stats, textures, Integer.parseInt(maxMutation.getText()), Integer.parseInt(minMutation.getText()));
+                SimulationEngine engine = new SimulationEngine(mapType[0],
+                        mutationType[0] ,Integer.parseInt(energyGrassInput.getText()),
+                        Integer.parseInt(numberOfGrassInput.getText()), Integer.parseInt(numberOfAnimalsInput.getText()),
+                        Integer.parseInt(genomeLengthInput.getText()), Integer.parseInt(energyOfAnimalInput.getText()),
+                        Integer.parseInt(readyToReproductionInput.getText()), Integer.parseInt(energyToKidInput.getText()),
+                        Integer.parseInt(heightInput.getText()), Integer.parseInt(widthInput.getText()), Integer.parseInt(delayInput.getText()), grid, stats, textures, Integer.parseInt(maxMutationInput.getText()), Integer.parseInt(minMutationInput.getText()), Integer.parseInt(startGrassInput.getText()), saveToCsv.isSelected(), simulationCounter);
                 createSimulationView(engine, grid, stats);
             } catch (NumberFormatException e) {
-                System.out.println("Niepoprawne dane");
+                System.out.println("Invalid configuration data");
             }
         });
     }
 
-    public void createSimulationView(SimulationEngine engine, GridPane grid, VBox stats) {
+    private String getValue(String line) {
+        return line.substring(line.indexOf(" ") + 1);
+    }
+
+    private void loadConfiguration(File configuration) {
+        try {
+            FileReader fileReader = new FileReader(configuration);
+            try {
+                BufferedReader bufferedReader = new BufferedReader(fileReader);
+                heightInput.setText(getValue(bufferedReader.readLine()));
+                widthInput.setText(getValue(bufferedReader.readLine()));
+                mapType[0] = getValue(bufferedReader.readLine());
+                mapTypeBox.setValue(mapType[0]);
+                minMutationInput.setText(getValue(bufferedReader.readLine()));
+                maxMutationInput.setText(getValue(bufferedReader.readLine()));
+                mutationType[0] = getValue(bufferedReader.readLine());
+                mutationTypeBox.setValue(mutationType[0]);
+                startGrassInput.setText(getValue(bufferedReader.readLine()));
+                numberOfGrassInput.setText(getValue(bufferedReader.readLine()));
+                numberOfAnimalsInput.setText(getValue(bufferedReader.readLine()));
+                genomeLengthInput.setText(getValue(bufferedReader.readLine()));
+                energyOfAnimalInput.setText(getValue(bufferedReader.readLine()));
+                energyGrassInput.setText(getValue(bufferedReader.readLine()));
+                readyToReproductionInput.setText(getValue(bufferedReader.readLine()));
+                energyToKidInput.setText(getValue(bufferedReader.readLine()));
+            } catch (IOException e) {
+                System.out.println("Couldn't read file.");
+            }
+            fileReader.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("Couldn't load file.");
+        } catch (IOException e) {
+            System.out.println("Couldn't close file.");
+        } catch (NullPointerException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void createSimulationView(SimulationEngine engine, GridPane grid, VBox stats) {
         Stage simulationStage = new Stage();
+        simulationStage.setTitle("Simulation " + simulationCounter);
         ScrollPane sp = new ScrollPane(grid);
         sp.setFitToWidth(true);
         sp.setFitToHeight(true);
@@ -133,6 +267,20 @@ public class Simulation extends Application {
         Thread engineThread = new Thread(engine);
         engineThread.start();
         simulationStage.setOnCloseRequest(e -> {
+            if (engine.getSave()) {
+                try {
+                    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss");
+                    LocalDateTime now = LocalDateTime.now();
+                    FileWriter fileWriter = new FileWriter("logs/simulation" + engine.getSimulationNumber() + "_" + dtf.format(now) + ".csv");
+                    for (String line:
+                            engine.getLogs()) {
+                        fileWriter.write(line + System.lineSeparator());
+                    }
+                    fileWriter.close();
+                } catch (IOException error) {
+                    System.out.println(error.getMessage());
+                }
+            }
             engineThread.stop();
         });
     }

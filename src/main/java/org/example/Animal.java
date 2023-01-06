@@ -82,7 +82,7 @@ public class Animal extends IMapElement{
         };
     }
     public void  reduceEnergy(int a){
-        energy=energy-a;
+        energy -= a;
 
     }
 

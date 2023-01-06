@@ -15,7 +15,7 @@ public class HellsPortal extends AbstractWorldMap{
     Vector2d moveTo(Vector2d position, Animal animal) {
         if (position.getX() >= width || position.getX() < 0 || position.getY() >= height || position.getY() < 0) {
             Random rand = new Random();
-            animal.addEnergy(-energyLoss);
+            animal.reduceEnergy(energyLoss);
             return new Vector2d(rand.nextInt(width), rand.nextInt(height));
         } else {
             return position;
