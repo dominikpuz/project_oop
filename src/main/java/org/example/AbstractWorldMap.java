@@ -122,6 +122,10 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver {
         GridObject a= objectsOnMap.get(new Vector2d(x,y));
         return a.isClickedAnima(animal);
     }
+    public boolean isGenotyp(int [] table,int x,int y){
+        GridObject a= objectsOnMap.get(new Vector2d(x,y));
+        return a.genotyp(table);
+    }
 
 
 }

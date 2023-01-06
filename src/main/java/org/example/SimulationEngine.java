@@ -35,6 +35,7 @@ public class SimulationEngine implements AnimalObserver, Runnable {
     private int n;
     private Animal clickedAnimal=null;
     private VBox statsDead;
+    private int[] gen;
 
     public SimulationEngine(int mapType, int randomType, int energyGrass, int numberOfGrass, int numberOfAnimals, int n, int energyOfAnimal, int readytoReproduction, int energyToKid, int height, int width, int moveDelay, GridPane grid, VBox stats, Textures textures, int maxMutation, int minMutation,VBox statsAnimal,VBox statsDead) {
         this.isPaused = true;
@@ -136,6 +137,7 @@ public class SimulationEngine implements AnimalObserver, Runnable {
             Label numberOfGrass= new Label(String.format("Number of grass : " + this.statisctic.returnGrass()));
             Label freePlace= new Label(String.format(" Number of free place: " + this.map.freeplace()));
             Label popularGen= new Label(String.format(" Popular gen: " + Arrays.toString(this.gen())));
+
             if(this.statisctic.numberOfDead>0){
                 Label deadDays= new Label(String.format(" Average of days od dead animal: " + this.statisctic.numberDayOfDead/this.statisctic.numberOfDead));
                 stats.getChildren().add(deadDays);
@@ -165,7 +167,7 @@ public class SimulationEngine implements AnimalObserver, Runnable {
                         label.setAlignment(Pos.CENTER);
                         GridPane.setHalignment(label, HPos.CENTER);
                         GridPane.setConstraints(label, 0, 0);
-                        Button coolButton = new Button();
+
 
                     } else if (i == 0) {
                         VBox field = new VBox(new Label(Integer.toString(j - 1)));
@@ -188,6 +190,7 @@ public class SimulationEngine implements AnimalObserver, Runnable {
                         GridObject object = (GridObject) map.objectAt(new Vector2d(i - 1, j - 1));
                         VBox field;
                         field = object.getBox();
+
                         if(this.clickedAnimal!=null && this.clickedAnimal.getDayOfDead()>0){
                             statsDead.getChildren().clear();
                             Label dead= new Label(String.format("Day of death: " + this.clickedAnimal.getDayOfDead()));
@@ -219,6 +222,9 @@ public class SimulationEngine implements AnimalObserver, Runnable {
                             }
 
                         }
+                        else if(this.map.isGenotyp(this.gen,i-1,j-1) && isPaused==true){
+                            field.setStyle("-fx-border-color: yellow; -fx-border-width: 1 1 1 1");
+                        }
                         else{
                             field.setStyle("-fx-border-color: black; -fx-border-width: 1 1 1 1");
 
@@ -245,6 +251,7 @@ public class SimulationEngine implements AnimalObserver, Runnable {
             button.setOnAction(event -> {
                 if(map.clickedAnimal(x-1,y-1)!=null){
                     this.clickedAnimal=map.clickedAnimal(x-1,y-1);
+                    updateMap();
 
 
 
@@ -261,6 +268,7 @@ public class SimulationEngine implements AnimalObserver, Runnable {
 
     public void pause() {
         isPaused = true;
+        updateMap();
     }
 
     public void resume() {
@@ -315,46 +323,25 @@ public class SimulationEngine implements AnimalObserver, Runnable {
 
     }
     public int[] gen() {
-        int maxi = 0;
-        int[] gen = new int[this.n];
+        int maxi = -1;
         for (Animal animal :
                 animals) {
             int number = 0;
             for (Animal animal2 :
                     animals) {
-                if (Arrays.equals(animal.getTable(), animal2.getTable()) ) {
+                if (Arrays.equals(animal.getTable(), animal2.getTable()) && animal.getTable()!=animal2.getTable()) {
                     number += 1;
 
                 }
             }
             if (maxi < number) {
                 maxi = number;
-                gen = animal.getTable();
+                this.gen = animal.getTable();
             }
         }
-        return gen;
+        return this.gen;
 
     }
 
-    public Animal animalGen() {
-        int maxi = 0;
-        Animal animalMax=null;
-        for (Animal animal :
-                animals) {
-            int number = 0;
-            for (Animal animal2 :
-                    animals) {
-                if (Arrays.equals(animal.getTable(), animal2.getTable()) ) {
-                    number += 1;
 
-                }
-            }
-            if (maxi < number) {
-                maxi = number;
-                animalMax=animal;
-            }
-        }
-        return animalMax;
-
-    }
 }
