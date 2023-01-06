@@ -1,8 +1,5 @@
 package org.example;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -104,7 +101,7 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver {
     public int freeplace(){
         int sum=0;
         for (GridObject x : objectsOnMap.values()){
-            sum+=x.freeplace();
+            sum+=x.freePlace();
 
         }
         return sum;

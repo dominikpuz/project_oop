@@ -8,9 +8,12 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import org.example.gui.Simulation;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,17 +30,22 @@ public class SimulationEngine implements AnimalObserver, Runnable {
     private VBox stats;
     private boolean isPaused;
     private int day;
-    private Statisctic statisctic;
+    private final Statisctic statisctic;
+    private final boolean save;
+    private List<String> logs;
+    private int simulationNumber;
 
-    public SimulationEngine(int mapType, int randomType, int energyGrass, int numberOfGrass, int numberOfAnimals, int n, int energyOfAnimal, int readytoReproduction, int energyToKid, int height, int width, int moveDelay, GridPane grid, VBox stats, Textures textures, int maxMutation, int minMutation) {
+    public SimulationEngine(String mapType, String randomType, int energyGrass, int numberOfGrass, int numberOfAnimals, int n, int energyOfAnimal, int readytoReproduction, int energyToKid, int height, int width, int moveDelay, GridPane grid, VBox stats, Textures textures, int maxMutation, int minMutation, int startGrassAmount, boolean save, int simulationNumber) {
         this.isPaused = true;
         this.energyGrass = energyGrass;
         this.numberOfGrass = numberOfGrass;
         this.moveDelay = moveDelay;
         this.grid = grid;
         this.stats = stats;
+        this.save = save;
+        this.simulationNumber = simulationNumber;
         day = 1;
-        if (mapType == 0) {
+        if (mapType.equals("Globe")) {
             map = new Globe(width, height);
         } else {
             map = new HellsPortal(width, height, energyToKid);
@@ -48,7 +56,7 @@ public class SimulationEngine implements AnimalObserver, Runnable {
         this.animals = new ArrayList<>();
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
-                if (randomType == 0) {
+                if (randomType.equals("Part random")) {
                     GridObject gridObject = new PartRandom(new Vector2d(i, j), map, n, readytoReproduction, energyToKid, this, textures, maxMutation, minMutation, statisctic);
                     map.addGridObject(gridObject);
                 } else {
@@ -57,19 +65,15 @@ public class SimulationEngine implements AnimalObserver, Runnable {
             }
         }
         map.setGrassSpawnProbability(width, height);
-        spawnGrass();
+        spawnGrass(startGrassAmount);
         for (int i = 0; i < numberOfAnimals; i++) {
             Animal animal = new Animal(new Vector2d(rand.nextInt(map.getWidth()), rand.nextInt(map.getHeight())), energyOfAnimal, this.randomGen(n), map);
             animals.add(animal);
             map.place(animal);
         }
+        logs = new ArrayList<>();
+        logs.add("day;number of animals;number of grass;free fields;most popular genome; average energy; average lifetime");
         updateMap();
-    }
-
-
-
-    public AbstractWorldMap getMap() {
-        return map;
     }
 
     public int[] randomGen(int n) {
@@ -94,11 +98,11 @@ public class SimulationEngine implements AnimalObserver, Runnable {
         animals.remove(animal);
     }
 
-    private void spawnGrass() {
+    private void spawnGrass(int grassAmount) {
         Random rand = new Random();
         int spawnedGrass = 0;
         for (int i = 0; i < 100; i++) {
-            if (spawnedGrass == numberOfGrass) {
+            if (spawnedGrass == grassAmount) {
                 break;
             }
             Vector2d position = new Vector2d(rand.nextInt(map.getWidth()), rand.nextInt(map.getHeight()));
@@ -113,15 +117,45 @@ public class SimulationEngine implements AnimalObserver, Runnable {
         }
     }
 
+    private String getAverageEnergy() {
+        double sum= 0;
+        for (Animal animal :
+                animals) {
+            sum += animal.getEnergy();
+        }
+        return String.format("%.2f", sum/animals.size());
+    }
+
     public void updateMap() {
         Platform.runLater(() -> {
+            if (save) {
+//                String genome = "";
+//                for (int gen :
+//                        statisctic.popularGen) {
+//                    genome += String.format(gen + " ");
+//                }
+//                genome.substring(0, genome.length() - 2)
+                logs.add(String.format(day + ";" + animals.size() + ';' + statisctic.returnGrass() + ";" +
+                        statisctic.getNumberOfFree() + ";" + Arrays.toString(statisctic.popularGen) +
+                        ";" + getAverageEnergy() + ";" + statisctic.getAverageLifetime()));
+            }
             stats.getChildren().clear();
             Label title = new Label("Statistics");
             stats.getChildren().add(title);
             Label day = new Label(String.format("Day: " + this.day));
-            Label numberOfAnimals = new Label(String.format("Number of animals: " + animals.size()));
             stats.getChildren().add(day);
+            Label numberOfAnimals = new Label(String.format("Number of animals: " + animals.size()));
             stats.getChildren().add(numberOfAnimals);
+            Label numberOfGrass = new Label(String.format("Number of grass: " + statisctic.returnGrass()));
+            stats.getChildren().add(numberOfGrass);
+            Label freeFields = new Label(String.format("Number of free fields: " + statisctic.getNumberOfFree()));
+            stats.getChildren().add(freeFields);
+            Label popularGenome = new Label(String.format("Most popular genome:\n " + Arrays.toString(statisctic.popularGen)));
+            stats.getChildren().add(popularGenome);
+            Label averageEnergy = new Label(String.format("Average energy: " + getAverageEnergy()));
+            stats.getChildren().add(averageEnergy);
+            Label averageLife = new Label(String.format("Average lifetime: " + statisctic.getAverageLifetime()));
+            stats.getChildren().add(averageLife);
             grid.getChildren().clear();
             int width = map.getWidth();
             int height = map.getHeight();
@@ -179,25 +213,9 @@ public class SimulationEngine implements AnimalObserver, Runnable {
 
     @Override
     public void run() {
-        FileWriter myWriter = null;
-        try {
-            myWriter = new FileWriter("filename.txt");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        try {
-            myWriter = new FileWriter("filename.txt");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
         while (animals.size() > 0) {
             while (isPaused) {
 
-            }
-            try {
-                myWriter.write("Files in Java might be tricky, but it is fun enough!");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
             }
             map.removeDeadAnimals();
 
@@ -218,7 +236,7 @@ public class SimulationEngine implements AnimalObserver, Runnable {
                     moves) {
                 ((GridObject) map.objectAt(position)).Reproduction();
             }
-            spawnGrass();
+            spawnGrass(numberOfGrass);
             updateMap();
             try {
                 Thread.sleep(this.moveDelay);
@@ -227,13 +245,19 @@ public class SimulationEngine implements AnimalObserver, Runnable {
             }
             day++;
         }
-        try {
-            myWriter.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
+    public int getSimulationNumber() {
+        return simulationNumber;
+    }
+
+    public boolean getSave() {
+        return save;
+    }
+
+    public List<String> getLogs() {
+        return logs;
+    }
     public void updateEnergy(){
         this.statisctic.newEnergy();
         this.statisctic.setNumberOfAnimals();
@@ -259,8 +283,6 @@ public class SimulationEngine implements AnimalObserver, Runnable {
                 maxi=number;
 
             }
-
         }
-
     }
 }

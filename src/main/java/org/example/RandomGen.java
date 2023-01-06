@@ -8,7 +8,7 @@ public class RandomGen extends GridObject{
     @Override
     int[] createRandomGen(int[] genTable,int maxMutation,int minMutation) {
         java.util.Random generator = new java.util.Random();
-        int sizeOfRandomGen=generator.nextInt(minMutation-maxMutation)+minMutation;
+        int sizeOfRandomGen=generator.nextInt(minMutation, maxMutation);
         for(int i=0;i<sizeOfRandomGen;i++){
             int changeGen=generator.nextInt(this.n);
             int newGen=generator.nextInt(8);

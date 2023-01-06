@@ -118,47 +118,44 @@ public abstract class GridObject {
         for (Animal y : tmp) {
             for (int i = 0; i < 3; i++) {
                 if (i == 0) {
-                    if (((Animal) y).getEnergy() > maxEnergy) {
-                        maxAnimal = (Animal) y;
-                        maxEnergy = ((Animal) y).getEnergy();
-                        maxDays = ((Animal) y).getDays();
-                        maxKids = ((Animal) y).getKids();
+                    if ( y.getEnergy() > maxEnergy) {
+                        maxAnimal = y;
+                        maxEnergy = y.getEnergy();
+                        maxDays = y.getDays();
+                        maxKids = y.getKids();
                         break;
                     }
-                    if (((Animal) y).getEnergy() < maxEnergy) {
+                    if ( y.getEnergy() < maxEnergy) {
                         break;
                     }
                 }
                 if (i == 1) {
-                    if (((Animal) y).getDays() > maxDays) {
-                        maxAnimal = (Animal) y;
-                        maxEnergy = ((Animal) y).getEnergy();
-                        maxDays = ((Animal) y).getDays();
-                        maxKids = ((Animal) y).getKids();
+                    if (y.getDays() > maxDays) {
+                        maxAnimal = y;
+                        maxEnergy = y.getEnergy();
+                        maxDays = y.getDays();
+                        maxKids = y.getKids();
                         break;
                     }
-                    if (((Animal) y).getDays() < maxDays) {
+                    if (y.getDays() < maxDays) {
                         break;
                     }
 
 
                 }
                 if (i == 2) {
-                    if (((Animal) y).getKids() > maxKids) {
-                        maxAnimal = (Animal) y;
-                        maxEnergy = ((Animal) y).getEnergy();
-                        maxDays = ((Animal) y).getDays();
-                        maxKids = ((Animal) y).getKids();
+                    if (y.getKids() > maxKids) {
+                        maxAnimal = y;
+                        maxEnergy = y.getEnergy();
+                        maxDays = y.getDays();
+                        maxKids = y.getKids();
                         break;
                     }
-                    if (((Animal) y).getKids() < maxKids) {
+                    if (y.getKids() < maxKids) {
                         break;
                     }
-
                 }
-
             }
-
         }
         return maxAnimal;
     }
@@ -197,9 +194,12 @@ public abstract class GridObject {
 
     public void feedAnimal() {
         if (grass != null && animalsOnGrid.size() > 0) {
-            bestAnimal(animalsOnGrid).addEnergy(grass.getEnergy());
-            grass = null;
-            this.statisctic.eatgrass();
+            Animal animal = bestAnimal(animalsOnGrid);
+            if (animal != null) {
+                animal.addEnergy(grass.getEnergy());
+                grass = null;
+                this.statisctic.eatgrass();
+            }
         }
     }
 
@@ -208,6 +208,7 @@ public abstract class GridObject {
 
 
     public void Reproduction() {
+        if (animalsOnGrid.size() < 2 ){return;}
         CopyOnWriteArrayList<Animal> tmp = new CopyOnWriteArrayList<>(animalsOnGrid);
         Animal animal1;
         Animal animal2;
@@ -230,14 +231,10 @@ public abstract class GridObject {
         return this.position;
     }
 
-    public int freeplace(){
+    public int freePlace(){
         if(grass != null || animalsOnGrid.size() > 0){
             return 0;
         }
         return 1;
-
     }
-
-
-
 }
