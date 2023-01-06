@@ -80,6 +80,7 @@ public abstract class GridObject {
                 for (AnimalObserver observer : observers) {
                     observer.removeAnimal(x);
                 }
+                x.deadAnimal();
                 this.statisctic.deadAnimal(x.getDays());
                 break;
             }
@@ -182,8 +183,9 @@ public abstract class GridObject {
         Animal newanimal = new Animal(animal2.getPosition(), 2 * energyToKid, this.createRandomGen(genTable,this.maxMutation,this.minMutation), this.map);
         animal1.reduceEnergy(energyToKid);
         animal2.reduceEnergy(energyToKid);
-        animal1.addDays();
+        animal1.addKids();
         animal2.addKids();
+
 
         this.addAnimal(newanimal);
         for (AnimalObserver observer : observers) {
@@ -199,8 +201,32 @@ public abstract class GridObject {
                 animal.addEnergy(grass.getEnergy());
                 grass = null;
                 this.statisctic.eatgrass();
+                animal.eatGrass();
             }
         }
+
+    }
+    public boolean isClickedAnima(Animal animal){
+        if(animalsOnGrid.size()>0){
+            for (Animal x : animalsOnGrid) {
+                if(animal==x){
+                    return true;
+                }
+
+            }
+        }
+        return false;
+
+
+    }
+    public Animal clickedAnimal(){
+        if(animalsOnGrid.size()>0){
+            return bestAnimal(animalsOnGrid);
+        }
+        else{
+            return null;
+        }
+
     }
 
 
