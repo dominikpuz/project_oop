@@ -5,6 +5,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.lang.Math;
@@ -263,4 +264,16 @@ public abstract class GridObject {
         }
         return 1;
     }
+    public boolean genotyp(int[] table){
+        for (Animal x : animalsOnGrid) {
+            if(Arrays.equals(table,x.getTable())){
+                return true;
+            }
+
+        }
+        return false;
+    }
+
+
+
 }

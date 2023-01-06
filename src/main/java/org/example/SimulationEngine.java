@@ -39,6 +39,7 @@ public class SimulationEngine implements AnimalObserver, Runnable {
     private int simulationNumber;
     private Animal clickedAnimal=null;
     private int n;
+    private int[] gen;
 
     public SimulationEngine(String mapType, String randomType, int energyGrass, int numberOfGrass, int numberOfAnimals, int n, int energyOfAnimal, int readytoReproduction, int energyToKid, int height, int width, int moveDelay, GridPane grid, VBox stats, Textures textures, int maxMutation, int minMutation, int startGrassAmount, boolean save, int simulationNumber) {
         this.isPaused = true;
@@ -228,6 +229,9 @@ public class SimulationEngine implements AnimalObserver, Runnable {
                             }
 
                         }
+                        else if(this.map.isGenotyp(this.gen,i-1,j-1) && isPaused==true){
+                            field.setStyle("-fx-border-color: yellow; -fx-border-width: 1 1 1 1");
+                        }
                         else{
                             field.setStyle("-fx-border-color: black; -fx-border-width: 1 1 1 1");
 
@@ -254,6 +258,7 @@ public class SimulationEngine implements AnimalObserver, Runnable {
             button.setOnAction(event -> {
                 if(map.clickedAnimal(x-1,y-1)!=null){
                     this.clickedAnimal=map.clickedAnimal(x-1,y-1);
+                    updateMap();
                 }
 
             });
@@ -267,6 +272,7 @@ public class SimulationEngine implements AnimalObserver, Runnable {
 
     public void pause() {
         isPaused = true;
+        updateMap();
     }
 
     public void resume() {
@@ -329,45 +335,23 @@ public class SimulationEngine implements AnimalObserver, Runnable {
 
     }
     public int[] gen() {
-        int maxi = 0;
-        int[] gen = new int[this.n];
+        int maxi = -1;
         for (Animal animal :
                 animals) {
             int number = 0;
             for (Animal animal2 :
                     animals) {
-                if (Arrays.equals(animal.getTable(), animal2.getTable()) ) {
+                if (Arrays.equals(animal.getTable(), animal2.getTable()) && animal.getTable()!=animal2.getTable()) {
                     number += 1;
 
                 }
             }
             if (maxi < number) {
                 maxi = number;
-                gen = animal.getTable();
+                this.gen = animal.getTable();
             }
         }
-        return gen;
+        return this.gen;
 
-    }
-
-    public Animal animalGen() {
-        int maxi = 0;
-        Animal animalMax=null;
-        for (Animal animal :
-                animals) {
-            int number = 0;
-            for (Animal animal2 :
-                    animals) {
-                if (Arrays.equals(animal.getTable(), animal2.getTable()) ) {
-                    number += 1;
-
-                }
-            }
-            if (maxi < number) {
-                maxi = number;
-                animalMax=animal;
-            }
-        }
-        return animalMax;
     }
 }
