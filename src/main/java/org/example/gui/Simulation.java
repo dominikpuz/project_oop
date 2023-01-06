@@ -10,6 +10,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -90,29 +91,33 @@ public class Simulation extends Application {
             try {
                 GridPane grid = new GridPane();
                 VBox stats = new VBox();
+                VBox statsAnimal = new VBox();
+                VBox statsdead = new VBox();
                 SimulationEngine engine = new SimulationEngine(Integer.parseInt(mapType.getText()),
                         Integer.parseInt(randomType.getText()) ,Integer.parseInt(energyGrass.getText()),
                         Integer.parseInt(numberOfGrass.getText()), Integer.parseInt(numberOfAnimals.getText()),
                         Integer.parseInt(n.getText()), Integer.parseInt(energyOfAnimal.getText()),
                         Integer.parseInt(readyToReproduction.getText()), Integer.parseInt(energyToKid.getText()),
-                        Integer.parseInt(height.getText()), Integer.parseInt(width.getText()), 50, grid, stats, textures, Integer.parseInt(maxMutation.getText()), Integer.parseInt(minMutation.getText()));
-                createSimulationView(engine, grid, stats);
+                        Integer.parseInt(height.getText()), Integer.parseInt(width.getText()), 500, grid, stats, textures, Integer.parseInt(maxMutation.getText()), Integer.parseInt(minMutation.getText()),statsAnimal,statsdead);
+                createSimulationView(engine, grid, stats, statsAnimal,statsdead);
             } catch (NumberFormatException e) {
                 System.out.println("Niepoprawne dane");
             }
         });
     }
 
-    public void createSimulationView(SimulationEngine engine, GridPane grid, VBox stats) {
+    public void createSimulationView(SimulationEngine engine, GridPane grid, VBox stats,VBox statsAnimal, VBox statsdead) {
         Stage simulationStage = new Stage();
         ScrollPane sp = new ScrollPane(grid);
         sp.setFitToWidth(true);
         sp.setFitToHeight(true);
         stats.setMinWidth(150);
+        statsAnimal.setMinWidth(150);
+        statsdead.setMinWidth(150);
         Button startButton = new Button("Start");
         Button stopButton = new Button("Stop");
         HBox menu = new HBox(startButton, stopButton);
-        HBox content = new HBox(stats, sp);
+        HBox content = new HBox(stats,statsAnimal,statsdead, sp);
         VBox container = new VBox(menu, content);
         Scene simulationScene = new Scene(container, 700, 600);
         stopButton.setDisable(true);
@@ -127,6 +132,14 @@ public class Simulation extends Application {
             stopButton.setDisable(true);
             startButton.setDisable(false);
         });
+        stopButton.setOnAction((event) -> {
+            engine.pause();
+            stopButton.setDisable(true);
+            startButton.setDisable(false);
+        });
+
+
+
 
         simulationStage.setScene(simulationScene);
         simulationStage.show();
@@ -136,5 +149,6 @@ public class Simulation extends Application {
             engineThread.stop();
         });
     }
+
 
 }

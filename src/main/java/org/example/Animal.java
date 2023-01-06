@@ -12,6 +12,8 @@ public class Animal extends IMapElement{
     private AbstractWorldMap map;
     private int days;
     private int kids;
+    private int numberOfGrass;
+    private int dayOfDead;
 
     public Animal(Vector2d position, int energy, int[] genes, AbstractWorldMap map) {
         super(position);
@@ -24,7 +26,25 @@ public class Animal extends IMapElement{
         addObserver(map);
         this.days=0;
         this.kids=0;
+        this.dayOfDead=0;
     }
+    public void  deadAnimal(){
+        this.dayOfDead=this.map.getDays();
+    }
+    public int getDayOfDead(){
+        System.out.println(this.dayOfDead);
+        return dayOfDead;
+    }
+    public int getGenIndex(){
+        return geneIndex;
+    }
+    public void eatGrass(){
+        this.numberOfGrass+=1;
+    }
+    public int getGrass(){
+        return numberOfGrass;
+    }
+
     
     public int getEnergy(){
         return energy;

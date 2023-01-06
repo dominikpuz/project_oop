@@ -13,11 +13,15 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver {
 
     protected int width;
     protected int height;
+    int days=0;
 
     public AbstractWorldMap(int width, int height) {
         objectsOnMap = new ConcurrentHashMap<>();
         this.width = width;
         this.height = height;
+    }
+    public int getDays(){
+        return days;
     }
 
     public void addGridObject(GridObject grid){
@@ -95,6 +99,7 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver {
 
 
     public void removeDeadAnimals() {
+        days+=1;
         for (GridObject x : objectsOnMap.values()){
             x.deadAnimal();
 
@@ -108,6 +113,14 @@ public abstract class AbstractWorldMap implements IPositionChangeObserver {
 
         }
         return sum;
+    }
+    public Animal clickedAnimal(int x ,int y){
+        GridObject a= objectsOnMap.get(new Vector2d(x,y));
+        return a.clickedAnimal();
+    }
+    public boolean isClickedAnimal(int x,int y,Animal animal){
+        GridObject a= objectsOnMap.get(new Vector2d(x,y));
+        return a.isClickedAnima(animal);
     }
 
 

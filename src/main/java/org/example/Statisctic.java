@@ -8,8 +8,8 @@ public class Statisctic {
     int middleOfEnergy;
     int middleOfDead;
     int sumOfEnergy;
-    int numberOfDead;
-    int numberDayOfDead;
+    int numberOfDead=0;
+    int numberDayOfDead=0;
 
 
     public Statisctic(int numberOfAnimals,int numberOfGrass,int numberOfFree,int[] popularGen,int middleOfEnergy,int middleOfDead,int energy){
@@ -31,6 +31,12 @@ public class Statisctic {
         this.numberDayOfDead+=days;
 
 
+    }
+    public int returnDead(){
+        return this.numberOfDead;
+    }
+    public int returnDayDead(){
+        return this.numberDayOfDead;
     }
     public void add(int energy){
        this.sumOfEnergy+=energy;
