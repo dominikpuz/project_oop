@@ -32,7 +32,6 @@ public class Animal extends IMapElement{
         this.dayOfDead=this.map.getDays();
     }
     public int getDayOfDead(){
-        System.out.println(this.dayOfDead);
         return dayOfDead;
     }
     public int getGenIndex(){

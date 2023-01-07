@@ -189,13 +189,20 @@ public class Simulation extends Application {
             try {
                 simulationCounter++;
                 GridPane grid = new GridPane();
-                VBox stats = new VBox();
+                VBox generalStats = new VBox();
+                VBox animalStats = new VBox();
+                VBox animalDead = new VBox();
+                VBox stats = new VBox(20, generalStats, animalStats, animalDead);
                 SimulationEngine engine = new SimulationEngine(mapType[0],
                         mutationType[0] ,Integer.parseInt(energyGrassInput.getText()),
                         Integer.parseInt(numberOfGrassInput.getText()), Integer.parseInt(numberOfAnimalsInput.getText()),
                         Integer.parseInt(genomeLengthInput.getText()), Integer.parseInt(energyOfAnimalInput.getText()),
                         Integer.parseInt(readyToReproductionInput.getText()), Integer.parseInt(energyToKidInput.getText()),
-                        Integer.parseInt(heightInput.getText()), Integer.parseInt(widthInput.getText()), Integer.parseInt(delayInput.getText()), grid, stats, textures, Integer.parseInt(maxMutationInput.getText()), Integer.parseInt(minMutationInput.getText()), Integer.parseInt(startGrassInput.getText()), saveToCsv.isSelected(), simulationCounter);
+                        Integer.parseInt(heightInput.getText()), Integer.parseInt(widthInput.getText()),
+                        Integer.parseInt(delayInput.getText()), grid, generalStats, textures,
+                        Integer.parseInt(maxMutationInput.getText()), Integer.parseInt(minMutationInput.getText()),
+                        Integer.parseInt(startGrassInput.getText()), saveToCsv.isSelected(), simulationCounter,
+                        animalStats, animalDead);
                 createSimulationView(engine, grid, stats);
             } catch (NumberFormatException e) {
                 System.out.println("Invalid configuration data");
