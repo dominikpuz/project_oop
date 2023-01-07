@@ -31,13 +31,13 @@ public class SimulationEngine implements AnimalObserver, Runnable {
     private final boolean save;
     private List<String> logs;
     private int simulationNumber;
-    private Animal clickedAnimal=null;
+    private Animal clickedAnimal = null;
     private int n;
     private int[] gen;
 
     public SimulationEngine(String mapType, String randomType, int energyGrass, int numberOfGrass, int numberOfAnimals, int n, int energyOfAnimal, int readytoReproduction, int energyToKid, int height, int width, int moveDelay, GridPane grid, VBox generalStats, Textures textures, int maxMutation, int minMutation, int startGrassAmount, boolean save, int simulationNumber, VBox animalStats, VBox animalDead) {
         this.isPaused = true;
-        this.n=n;
+        this.n = n;
         this.energyGrass = energyGrass;
         this.numberOfGrass = numberOfGrass;
         this.moveDelay = moveDelay;
@@ -55,7 +55,7 @@ public class SimulationEngine implements AnimalObserver, Runnable {
         }
         Random rand = new Random();
         int[] table = new int[n];
-        this.statisctic=new Statisctic(numberOfAnimals,0,0,table,0,0,energyOfAnimal);
+        this.statisctic = new Statisctic(numberOfAnimals, 0, 0, table, 0, 0, energyOfAnimal);
         this.animals = new ArrayList<>();
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
@@ -121,19 +121,19 @@ public class SimulationEngine implements AnimalObserver, Runnable {
     }
 
     private String getAverageEnergy() {
-        double sum= 0;
+        double sum = 0;
         for (Animal animal :
                 animals) {
             sum += animal.getEnergy();
         }
-        return String.format("%.2f", sum/animals.size());
+        return String.format("%.2f", sum / animals.size());
     }
 
     public void updateMap() {
         Platform.runLater(() -> {
             if (save) {
                 logs.add(String.format(day + ";" + animals.size() + ';' + statisctic.returnGrass() + ";" +
-                        statisctic.getNumberOfFree() + ";" + Arrays.toString(statisctic.popularGen) +
+                        map.freeplace() + ";" + Arrays.toString(gen()) +
                         ";" + getAverageEnergy() + ";" + statisctic.getAverageLifetime()));
             }
             generalStats.getChildren().clear();
@@ -188,40 +188,32 @@ public class SimulationEngine implements AnimalObserver, Runnable {
                         GridObject object = (GridObject) map.objectAt(new Vector2d(i - 1, j - 1));
                         VBox field;
                         field = object.getBox();
-                        if(this.clickedAnimal!=null && this.clickedAnimal.getDayOfDead()>0){
+                        if (this.clickedAnimal != null && this.clickedAnimal.getDayOfDead() > 0) {
                             animalDead.getChildren().clear();
-                            Label dead= new Label(String.format("Day of death: " + this.clickedAnimal.getDayOfDead()));
+                            Label dead = new Label(String.format("Day of death: " + this.clickedAnimal.getDayOfDead()));
                             animalDead.getChildren().add(dead);
                         }
-                        if(map.isClickedAnimal(i-1,j-1, this.clickedAnimal)) {
+                        if (map.isClickedAnimal(i - 1, j - 1, this.clickedAnimal)) {
                             field.setStyle("-fx-border-color: orange; -fx-border-width: 1 1 1 1");
                             animalStats.getChildren().clear();
                             Label title2 = new Label("Statistics of this animal");
                             animalStats.getChildren().add(title2);
-                            Label energyOfAnimal= new Label(String.format("Energy of animal: " + this.clickedAnimal.getEnergy()));
+                            Label energyOfAnimal = new Label(String.format("Energy of animal: " + this.clickedAnimal.getEnergy()));
                             animalStats.getChildren().add(energyOfAnimal);
-                            Label gen= new Label(String.format("Gen: " + Arrays.toString(this.clickedAnimal.getTable())));
+                            Label gen = new Label(String.format("Genome:\n" + Arrays.toString(this.clickedAnimal.getTable())));
                             animalStats.getChildren().add(gen);
-                            Label genIndex= new Label(String.format("Gen: " + this.clickedAnimal.getGenIndex()));
+                            Label genIndex = new Label(String.format("Activated gen index: " + this.clickedAnimal.getGenIndex()));
                             animalStats.getChildren().add(genIndex);
-                            Label kids= new Label(String.format("Number of Kids: " + this.clickedAnimal.getKids()));
+                            Label kids = new Label(String.format("Number of Kids: " + this.clickedAnimal.getKids()));
                             animalStats.getChildren().add(kids);
-                            Label grass= new Label(String.format("Number of eating grass: " + this.clickedAnimal.getGrass()));
+                            Label grass = new Label(String.format("Number of eaten grass: " + this.clickedAnimal.getGrass()));
                             animalStats.getChildren().add(grass);
-                            if(this.clickedAnimal.getDayOfDead()>0){
-                                Label dead= new Label(String.format("Day of death: " + this.clickedAnimal.getDayOfDead()));
-                                animalStats.getChildren().add(dead);
-                            }
-                            else{
-                                Label days= new Label(String.format("Number of days " + this.clickedAnimal.getDays()));
-                                animalStats.getChildren().add(days);
-                            }
+                            Label days = new Label(String.format("Number of days " + this.clickedAnimal.getDays()));
+                            animalStats.getChildren().add(days);
 
-                        }
-                        else if(this.map.isGenotyp(this.gen,i-1,j-1) && isPaused==true){
+                        } else if (this.map.isGenotyp(this.gen, i - 1, j - 1) && isPaused) {
                             field.setStyle("-fx-border-color: yellow; -fx-border-width: 1 1 1 1");
-                        }
-                        else{
+                        } else {
                             field.setStyle("-fx-border-color: black; -fx-border-width: 1 1 1 1");
 
                         }
@@ -231,9 +223,8 @@ public class SimulationEngine implements AnimalObserver, Runnable {
                         field.setMinHeight(gridSize);
                         GridPane.setConstraints(field, i, j);
                         grid.getChildren().add(field);
-                        Node singleCell = createButton(i,j);
+                        Node singleCell = createButton(i, j);
                         grid.add(singleCell, i, j, 1, 1);
-
 
 
                     }
@@ -241,17 +232,18 @@ public class SimulationEngine implements AnimalObserver, Runnable {
             }
         });
     }
+
     public Node createButton(int x, int y) {
         Button button = new Button();
 
-            button.setOnAction(event -> {
-                if(map.clickedAnimal(x-1,y-1)!=null){
-                    this.clickedAnimal=map.clickedAnimal(x-1,y-1);
-                    animalDead.getChildren().clear();
-                    updateMap();
-                }
+        button.setOnAction(event -> {
+            if (isPaused && map.clickedAnimal(x - 1, y - 1) != null) {
+                this.clickedAnimal = map.clickedAnimal(x - 1, y - 1);
+                animalDead.getChildren().clear();
+                updateMap();
+            }
 
-            });
+        });
         button.setMinWidth(1);
         button.setMaxWidth(50);
         button.setMinHeight(1);
@@ -316,7 +308,8 @@ public class SimulationEngine implements AnimalObserver, Runnable {
     public List<String> getLogs() {
         return logs;
     }
-    public void updateEnergy(){
+
+    public void updateEnergy() {
         this.statisctic.newEnergy();
         for (Animal animal :
                 animals) {
@@ -324,6 +317,7 @@ public class SimulationEngine implements AnimalObserver, Runnable {
         }
 
     }
+
     public int[] gen() {
         int maxi = -1;
         for (Animal animal :
@@ -331,7 +325,7 @@ public class SimulationEngine implements AnimalObserver, Runnable {
             int number = 0;
             for (Animal animal2 :
                     animals) {
-                if (Arrays.equals(animal.getTable(), animal2.getTable()) && animal.getTable()!=animal2.getTable()) {
+                if (Arrays.equals(animal.getTable(), animal2.getTable()) && animal.getTable() != animal2.getTable()) {
                     number += 1;
 
                 }

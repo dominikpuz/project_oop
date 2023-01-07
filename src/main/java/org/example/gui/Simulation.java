@@ -192,7 +192,8 @@ public class Simulation extends Application {
                 VBox generalStats = new VBox();
                 VBox animalStats = new VBox();
                 VBox animalDead = new VBox();
-                VBox stats = new VBox(20, generalStats, animalStats, animalDead);
+                VBox animalStatsWrapper = new VBox(animalStats, animalDead);
+                VBox stats = new VBox(20, generalStats, animalStatsWrapper);
                 SimulationEngine engine = new SimulationEngine(mapType[0],
                         mutationType[0] ,Integer.parseInt(energyGrassInput.getText()),
                         Integer.parseInt(numberOfGrassInput.getText()), Integer.parseInt(numberOfAnimalsInput.getText()),
@@ -260,7 +261,7 @@ public class Simulation extends Application {
         HBox menu = new HBox(startButton, stopButton);
         HBox content = new HBox(stats, sp);
         VBox container = new VBox(menu, content);
-        Scene simulationScene = new Scene(container, 700, 600);
+        Scene simulationScene = new Scene(container, 800, 700);
         stopButton.setDisable(true);
         startButton.setOnAction((event) -> {
             engine.resume();
