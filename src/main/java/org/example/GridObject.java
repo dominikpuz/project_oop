@@ -55,15 +55,23 @@ public abstract class GridObject {
             imageView.setFitWidth(20);
             box.getChildren().add(imageView);
         }
-        for (Animal animal :
-                animalsOnGrid) {
+//        for (Animal animal :
+//                animalsOnGrid) {
+//            ImageView imageView = new ImageView(textures.textures.get(animal.getTexture()));
+//            imageView.setFitHeight(20);
+//            imageView.setFitWidth(20);
+//            VBox animalBox = new VBox(imageView, new Label(Integer.toString(animal.getEnergy())));
+//            box.getChildren().add(animalBox);
+//        }
+        Animal animal = bestAnimal(animalsOnGrid);
+        if (animal != null) {
             ImageView imageView = new ImageView(textures.textures.get(animal.getTexture()));
             imageView.setFitHeight(20);
             imageView.setFitWidth(20);
             VBox animalBox = new VBox(imageView, new Label(Integer.toString(animal.getEnergy())));
             box.getChildren().add(animalBox);
+            box.setAlignment(Pos.CENTER);
         }
-        box.setAlignment(Pos.CENTER);
         return box;
     }
 
@@ -273,7 +281,5 @@ public abstract class GridObject {
         }
         return false;
     }
-
-
 
 }
